@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <?php include("enlaces.phtml"); ?>
+  <style type="text/css">
+    td input[type="checkbox"] {
+      margin: -9px 0 0;
+  
+    }
+  </style>
+</head>
+
+<body>
+  <div data-role="page" id="admin-ini-page" >
+  	<div data-role="header" style="background-image: url(images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+        <?php include("header.phtml"); ?>
+    </div>
+      <!-- ## Contenedor principal ## -->
+    <div role="main" class="ui-content">
+<br><br>
+<div class="row">
+    <div class="col-md-10 col-md-offset-1" id="listado">
+       <div role="main" class="ui-content">
+            <div data-role="collapsibleset">
+              <table id="" class="display" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th>&nbsp;</th>
+                            <th>Tipo</th>
+                            <th>Documento</th>
+                            <th>Emision</th>
+                            <th>Vencimiento</th>                            
+                            <th style="text-align: center">Monto</th> 
+                            <th style="text-align: center">Abonado</th> 
+                            <th>&nbsp;</th>                                                                   
+                        </tr>
+                    </thead>
+                    <tbody>
+                      <form type="POST" action="/abonarSub" id="lista">
+                        <?php $i=0;
+                        foreach($data as $d){
+                          $cad=substr($d['NUMEDOCU'], 0, 1);
+                          if($cad!="CC" || $cad!="RE"){
+                        ?>
+                        <tr>
+                            <td><?php if($d['MONTO']>$d['saldo']){ ?><input type="checkbox" class="facture" data-id="<?php echo $d['NUMEDOCU']; ?> " data-monto="<?php echo $d['MONTO']; ?> " onChange="comprobar(this);"><?php } ?></td>
+                            <td><?php echo $d['TIPODOCU']; ?></td>
+                            <td><?php echo $d['NUMEDOCU']; ?></td>
+                            <td><?php echo $d['fecha']; ?></td>
+                            <td><?php echo $d['fechvenc']; ?></td>                            
+                            <td style="text-align: right"><?php echo number_format($d['MONTO'],2); ?></td>
+                            <td style="text-align: right"><?php echo number_format($d['saldo'],2); ?></td>
+                            <td><center><a href="pagos/<?php echo $d['NUMEDOCU']; ?>" data-role="button" class="btn btn-primary btn-sm" transition="flip" data-rel="dialog" data-theme="d" title="Pagos Realizados">Pagos</a>&nbsp;&nbsp; <?php if($d['MONTO']>$d['saldo']){ ?><a href="abonar/<?php echo $d['NUMEDOCU']; ?>/<?php echo $d['MONTO']; ?>" data-role="button" class="btn btn-primary btn-sm" transition="flip" data-rel="dialog" data-theme="d" title="Abonar Pago">Abonar</a><?php } ?></center></td>                     
+                        </tr>
+                          <?php
+                           }
+                           $i++;
+                         }
+                        ?>
+                         <div class="panel-body col-md-3">                        
+                               <button type="button"  onclick="abvarios();" class="btn btn-default"    id="btn" name="btn" disabled="true"><strong>Abonar</strong></
+                          </div>
+                        </form>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+ $(function(){
+    $('table.display').DataTable();
+ })
+function abvarios(){
+
+ $('#enlac').remove();
+  var facturas = [];
+  var montos = [];
+  var i=0;
+  $('.facture').each(function(){
+
+    if($(this).is(':checked')){
+      
+      facturas.push($(this).data('id'));
+      montos.push($(this).data('monto'));
+      i++;
+    }
+
+  });
+
+    //$('body').append(response);
+    $('body').append("<div id='enlac' style='display:block;position:fixed;background-color: rgba(0, 0, 0, 0.24);margin:auto;padding-top:200px;width:100%;height:100%;text-align:center; z-index:999' onclick='cerrarenlac()'><a  onclick='cerrarenlac()' href='"+server +"../createList/"+facturas+"/"+montos+"' transition='flip' data-rel='dialog' ><STRONG>¿Desea abonar la las siguientes facturas "+facturas+"?</STRONG></a></div>");
+
+}
+
+
+function cerrarenlac(){
+  $('#enlac').remove();
+}
+
+function comprobar(obj)
+{   
+    if (obj.checked)
+        document.getElementById('btn').disabled = false;
+    else
+        document.getElementById('btn').disabled = true;
+}
+
+
+</script>
+
+  </div>
+      <!-- ## FIN contenedor principal ## -->
+      
+  	<div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF;">
+      <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+    </div>
+  </div>
+</body>
+</html>

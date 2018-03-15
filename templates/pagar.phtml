@@ -1,0 +1,76 @@
+<?php 
+ $title="Inicio";
+?>
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+</head>
+
+<body>
+  <div data-role="page" id="admin-ini-page" >
+  	<div data-role="header" style="background-image: url(images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+        <?php include("header.phtml"); ?>
+    </div>
+      <!-- ## Contenedor principal ## -->
+    <div role="main" class="ui-content">
+<br><br>
+<div class="row">
+    <div class="col-md-10 col-md-offset-1" id="listado">
+       <div role="main" class="ui-content">
+            <div data-role="collapsibleset">
+              <table id="" class="display" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Documento</th>
+                            <th>Emision</th>
+                            <th>Vencimiento</th>
+                            <th>Descripcion</th>
+                            <th style="text-align: center">Monto</th>                           
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        foreach($data as $d){
+                          $cad=substr($d['NUMEDOCU'], 0, 1);
+                          if($cad!="CC" || $cad!="RE"){
+                        ?>
+                        <tr>
+                            <td><?php echo $d['TIPODOCU']; ?></td>
+                            <td><?php echo $d['NUMEDOCU']; ?></td>
+                            <td><?php echo $d['fecha']; ?></td>
+                            <td><?php echo $d['fechvenc']; ?></td>
+                            <td><?php echo $d['DESCRI']; ?></td>
+                            <td style="text-align: right"><?php echo number_format($d['MONTO'],2); ?></td>
+        
+                        </tr>
+                        <?php
+                         }
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+ $(function(){
+    $('table.display').DataTable();
+ })
+
+
+</script>
+
+  </div>
+      <!-- ## FIN contenedor principal ## -->
+      
+  	<div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF;">
+      <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+    </div>
+  </div>
+</body>
+</html>

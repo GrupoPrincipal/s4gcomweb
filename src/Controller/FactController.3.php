@@ -1,0 +1,565 @@
+<?php
+
+namespace App\Controller;
+
+use App\Core\Controller;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
+
+class FactController extends Controller
+{
+    public function menu(Request $request, Response $response, $args){
+        $bus = $this->db->prepare("SELECT `MOD` FROM `tmodcta` WHERE `TCUENTA` = :iduser  and ESTATUS='1'");
+            $bus->bindParam("iduser",$_SESSION["user"]['CUENV_USUARIO']);
+            $bus->execute();
+            $mod = $bus->fetchAll();
+            $data  = $mod;
+            $_SESSION["modulos"] = $data;
+
+$html='';
+         foreach ($data as $value) {
+             
+        if($value['MOD']=='1'){  
+                $html.='<li ><a href="#!" onclick=redirect("./") >Inicio</a></li>';
+        } 
+        if($value['MOD']=='2'){    
+               $html.='<li><a href="#!" onclick=redirect("pedidos")>Pedidos</a></li>';  
+        }   
+        if($value['MOD']=='3'){                     
+             $html.=' <li class="dropdown">';
+             $html.='<a href="#" class="dropdown-toggle" data-toggle="dropdown">';
+             $html.='Cuentas por pagar<b class="caret"></b>';
+             $html.='   </a>';
+             $html.='   <ul class="dropdown-menu">';
+             $html.='     <li><a href="#" onclick=redirect("cuentas")>Estado de cuentas</a></li>';
+             $html.='     <li class="divider"></li>';
+             $html.='     <li><a href="#"  onclick=redirect("facturaxpagar")>Facturas por pagar</a></li>';
+         $html.='      </ul>';
+          $html.='   </li> ';
+          }   
+          if($value['MOD']=='4'){                    
+          $html.='<li class="dropdown">';
+           $html.='<a href="#" class="dropdown-toggle" data-toggle="dropdown">';
+          $html.='Articulos<b class="caret"></b>';
+          $html.='</a>';
+         $html.='<ul class="dropdown-menu">';
+          $html.='<li><a href="#" onclick=redirect("nuevos")>Nuevos</a></li>';
+          $html.='<li class="divider"></li>';
+           $html.='<li><a href="#"  onclick=redirect("descontinuados")>Descontinuados</a>';
+         $html.='</li>';
+           $html.='</ul>';
+          $html.='</li>';
+             } 
+             if($value['MOD']=='5'){    
+            $html.='<li><a href="#" onclick=redirect("fpagosday") >Pagos del día</a></li>';
+             } 
+            }
+
+            return $response->withJson(array('content'=>$html));
+    }
+    public function facturas(Request $request, Response $response, $args){
+        $data = array();
+        $stmt = $this->ventor->prepare("SELECT tfacpeda.NUMEPEDI,   tfacpeda.CODICLIE,  tfacpeda.FECHA, tfacpeda.TOTAPEDI FROM `tfacpeda` WHERE CODICLIE = :idcuenta  ORDER BY NUMEPEDI DESC");  //ORDER BY NUMEPEDI DESC  limit 20 and numepedi='711020813'
+        $stmt->bindParam("idcuenta", $_SESSION["user"]["info"]["CLIEV_IDCLIENTE"]);
+        $stmt->execute();
+        $data = $stmt->fetchAll();
+        /* return $response->withJson(array(
+            "id" => $_SESSION["user"]["info"]["CLIEV_IDCLIENTE"]
+        )); 
+        foreach($data as $d){
+            
+            $stmt = $this->guia->prepare("");
+            $stmt->bindParam("idpedi", $d["NUMEPEDI"]);
+            $stmt->execute();
+            $dt = $stmt->fetch();
+            
+            //$data["detalle"]=$dt[""];
+        }
+        */
+        return $response->withJson($data);
+    }
+  
+    public function factura(Request $request, Response $response, $args){
+        $data = array();
+        $data2 = array();
+        $data3 = array();
+        $stmt = $this->ventor->prepare("SELECT tfacpeda.NUMEPEDI,   tfacpeda.CODICLIE,tfacpeda.MOTIRECH,    tfacpeda.FECHA, tfacpeda.TOTAPEDI FROM `tfacpeda` WHERE CODICLIE = :idcuenta ORDER BY NUMEPEDI DESC");
+        $stmt->bindParam("idcuenta", $_SESSION["user"]["info"]["CLIEV_IDCLIENTE"]);
+        $stmt->execute();
+        $data = $stmt->fetch();
+        
+        $stmt = $this->ventor->prepare("SELECT numedocu,numeguia FROM tfachisa WHERE numepedi= :idpedido ");
+        $stmt->bindParam("idpedido", $data['NUMEPEDI']);
+        $stmt->execute();
+        $data2 = $stmt->fetch();
+        $data=array_merge($data,$data2);
+        
+        $stmt = $this->ventor->prepare("SELECT TIPODOCU, NUMEDOCU, NUMEGUIA, DATE_FORMAT(FENTREGA, '%Y-%m-%d') as FENTREGA FROM tcpcc WHERE TIPODOCU = 'FA' and NUMEDOCU = :idfactura");
+        $stmt->bindParam("idfactura", $data2['numedocu']);
+        $stmt->execute();
+        $data3 = $stmt->fetch();
+        $data=array_merge($data,$data3);
+        /* return $response->withJson(array(
+            "id" => $_SESSION["user"]["info"]["CLIEV_IDCLIENTE"]
+          )); */
+        return $response->withJson($data);
+    }
+    public function detalle(Request $request, Response $response, $args){
+         $data = array();
+        $data2 = array();
+        $data3 = array();
+        $data4 = array();
+        
+        $stmt = $this->ventor->prepare("SELECT ped.NUMEPEDI, ped.FECHA, tcpca.NOMBCLIE, ped.CODIPROD,ped.CAJAS,ped.UNIDADES,ped.UNIDDESP,ped.PRECIO,prod.DESCPROD,prod.UNIDCAJA, tfacpeda.TOTAPEDI, ped.IMPU1 FROM tfacpedb AS ped INNER JOIN tinva AS prod INNER JOIN tfacpeda ON ped.NUMEPEDI = tfacpeda.NUMEPEDI INNER JOIN tcpca ON tfacpeda.CODICLIE = tcpca.CODICLIE WHERE ped.codiprod = prod.codiprod AND ped.numepedi = :idpedido");
+        $stmt->bindParam("idpedido", $args['pedido']);
+        $stmt->execute();
+        $data = $stmt->fetchAll();
+        
+        $stmt = $this->ventor->prepare("SELECT tfacpeda.MOTIRECH FROM `tfacpeda` WHERE NUMEPEDI = :idpedido ORDER BY NUMEPEDI DESC");
+        $stmt->bindParam("idpedido", $args['pedido']);
+        $stmt->execute();
+        $data2 = $stmt->fetch();
+        
+        $stmt = $this->ventor->prepare("SELECT numedocu,numeguia FROM tfachisa WHERE numepedi= :idpedido ");
+        $stmt->bindParam("idpedido", $args['pedido']);
+        $stmt->execute();
+        $data3 = $stmt->fetch();
+        $data2=array_merge($data2,$data3);
+        
+        $stmt = $this->ventor->prepare("SELECT TIPODOCU, NUMEDOCU, NUMEGUIA, FENTREGA FROM tcpcc WHERE TIPODOCU = 'FA' and NUMEDOCU = :idfactura");
+        $stmt->bindParam("idfactura", $data3['numedocu']);
+        $stmt->execute();
+        $data4 = $stmt->fetch();
+        $data2=array_merge($data2,$data4);
+        
+        $resp=array($data,$data2);
+        return $this->renderer->render($response, 'detalle.phtml',$resp );
+        
+        return $this->renderer->render($response, 'detalle.phtml', $data);
+    }
+    public function detalle_factura(Request $request, Response $response, $args){
+        $data = array();
+        $stmt = $this->ventor->prepare("SELECT fac.numedocu, fac.pedido, fac.codiprod, fac.cajas, fac.unidades, fac.fecha,  prod.descunid, fac.precvent, fac.descuento, fac.descuent2, fac.totaprod, fac.codiclie, REPLACE(DATE(fac.fecha),'-',''), prod.descprod, prod.unidcaja, prod.precsuge, fac.impu1, prod.miliunid
+                         FROM  tfachisb fac INNER JOIN tinva prod 
+                         WHERE fac.codiprod=prod.codiprod AND fac.tipodocu='FA' AND fac.pedido = :idpedido");
+        $stmt->bindParam("idpedido", $args['pedido']);
+        $stmt->execute();
+        $data = $stmt->fetchAll();
+        
+        $data2 = array();
+        $qdata2 = $this->ventor->prepare("SELECT nc.numedocu, nc.NUMEAFEC from tfachisa fac INNER JOIN tcpcc nc on fac.NUMEDOCU=nc.NUMEAFEC WHERE fac.NUMEPEDI= :idpedido and nc.TIPODOCU='NC'");
+        $qdata2->bindParam("idpedido", $args['pedido']);
+        $qdata2->execute();
+        $data2=$qdata2->fetch();
+        $data["nc"]=$data2;
+
+        $dist = array();
+        $dt = $this->ventor->prepare("SELECT NOMBALMA, NOMBGERE, DIRECCION1, DIRECCION2, CIUDAD, ESTADO, TELEFONO1, RIF FROM `tdisb`");
+        $dt->execute();
+        $dist = $dt->fetch();
+        $data["distribuidor"]=$dist;
+
+        $clie = array();
+        $clieq = $this->ventor->prepare("SELECT cli.NOMBCLIE,  cli.RAZOSOCI,  cli.DIRECCION1,  cli.CODIPOST,  cli.TELEFONO1,  cli.RIF,  cli.CODICLIE, est.nombesta, ciu.nombciud 
+from `tcpca` cli INNER JOIN testa est on cli.codiesta=est.codiesta INNER JOIN tciua ciu on ciu.codiciud=cli.codiciud where CODICLIE = :idcliente");
+        $clieq->bindParam("idcliente", $_SESSION["user"]["info"]["CLIEV_IDCLIENTE"]);
+        $clieq->execute();
+        $clie = $clieq->fetch();
+        $data["cliente"]=$clie;
+        return $this->renderer->render($response, 'factura.phtml', $data);
+    }
+
+
+    public function empresa(Request $request, Response $response, $args){
+        $data = array();
+        $stmt = $this->ventor->prepare("SELECT NOMBALMA, NOMBGERE, DIRECCION1, DIRECCION2, CIUDAD, ESTADO, TELEFONO1, RIF FROM `tdisb`");
+        $stmt->execute();
+        $data = $stmt->fetch();
+        return $data;
+    }
+    public function devoluciones(Request $request, Response $response, $args){
+        $data = array();
+        $stmt = $this->ventor->prepare("SELECT cab.numedocu, cab.fecha, cab.numepedi, cab.codiclie, det.codiprod, det.cajas, det.unidades, det.precvent, det.descuento, det.descuent2, det.totaprod, det.impu1, inv.descprod, inv.unidcaja, inv.miliunid FROM tfachisa cab inner join  tfachisb det on cab.numedocu = det.numedocu  inner join tinva inv on det.codiprod = inv.codiprod WHERE cab.tipodocu='DV' AND cab.numepedi= :idpedido");
+        $stmt->bindParam("idpedido", $args['pedido']);
+        $stmt->execute();
+        $data = $stmt->fetchAll();
+
+        $fac = array();
+        $fact = $this->ventor->prepare("SELECT numedocu, fecha, totadocu  from tfachisa where numepedi = :idpedido and tipodocu='FA'");
+        $fact->bindParam("idpedido", $args['pedido']);
+        $fact->execute();
+        $fac = $fact->fetch();
+        $data["factura"]=$fac;
+
+        $nc = array();
+        $ncs= $this->ventor->prepare("SELECT numedocu from tcpcc where NUMEAFEC= :ifactura and TIPODOCU='NC'");
+        $ncs->bindParam("ifactura", $fac['numedocu']);
+        $ncs->execute();
+        $nc= $ncs->fetch();
+        $data["ncredito"]=$nc;
+
+        $dist = array();
+        $dt = $this->ventor->prepare("SELECT NOMBALMA, NOMBGERE, DIRECCION1, DIRECCION2, CIUDAD, ESTADO, TELEFONO1, RIF FROM `tdisb`");
+        $dt->execute();
+        $dist = $dt->fetch();
+        $data["distribuidor"]=$dist;
+
+        $clie = array();
+        $clieq = $this->ventor->prepare("SELECT cli.NOMBCLIE,  cli.RAZOSOCI,  cli.DIRECCION1,  cli.CODIPOST,  cli.TELEFONO1,  cli.RIF,  cli.CODICLIE, est.nombesta, ciu.nombciud 
+from `tcpca` cli INNER JOIN testa est on cli.codiesta=est.codiesta INNER JOIN tciua ciu on ciu.codiciud=cli.codiciud where CODICLIE = :idcliente");
+        $clieq->bindParam("idcliente", $_SESSION["user"]["info"]["CLIEV_IDCLIENTE"]);
+        $clieq->execute();
+        $clie = $clieq->fetch();
+        $data["cliente"]=$clie; 
+           
+        return $this->renderer->render($response, 'devoluciones.phtml', $data);
+    }
+    
+    public function cuentas(Request $request, Response $response, $args){
+        $data = array();
+        $stmt = $this->ventor->prepare("SELECT tcpcc.TIPODOCU, tcpcc.NUMEDOCU, DATE(FECHA) as fecha,  DATE(FECHVENC) as fechvenc, tcpcc.SIGNO, tcpcc.MONTO, tcpcc.ABONOS,tcpcc.DESCRI, tcpcc.FCANCEL, DATE(tcpcc.FENTREGA) fentrega, tcpcc.FDIASCRE, tcpcc.FVENCMTO, tcpcc.TIPOAFEC, tcpcc.NUMEAFEC, tcpcc.FECHACGS, tcpcc.LINENUME, tcpcc.CODICLIE FROM tcpcc where CODICLIE = :idcliente and  TIPODOCU IN ('CD','DV','FA') and MONTH(fecha)=MONTH(CURDATE()) and year(fecha)=year(CURDATE()) order by fecha desc");
+        $stmt->bindParam("idcliente", $_SESSION["user"]["info"]["CLIEV_IDCLIENTE"]);
+        $stmt->execute();
+        $data = $stmt->fetchAll();
+        return $this->renderer->render($response, 'pagar.phtml', $data);
+    }
+
+
+
+    public function facturaxpagar(Request $request, Response $response, $args){
+        $data = array();
+        $stmt = $this->ventor->prepare("SELECT a.TIPODOCU, a.NUMEDOCU, DATE(a.FECHA) as fecha,  DATE(a.FECHVENC) as fechvenc, a.MONTO, a.MONTO-a.ABONOS as saldov,  a.FVENCMTO, a.CODICLIE, case  when SUM(b.MONTO) is null then '0' else SUM(b.MONTO)   end as saldo FROM ventoradm001.tcpcc a LEFT OUTER JOIN  webs4gcom.tcfactpagar b on a.NUMEDOCU= b.NUMEDOCU where a.CODICLIE = :idcliente and  a.TIPODOCU ='FA' and a.MONTO-a.ABONOS > 0 GROUP BY a.TIPODOCU, a.NUMEDOCU, a.FECHVENC, a.MONTO, a.MONTO-a.ABONOS,  a.FVENCMTO, a.CODICLIE  order by a.fecha desc");
+        $stmt->bindParam("idcliente", $_SESSION["user"]["info"]["CLIEV_IDCLIENTE"]);
+        $stmt->execute();
+        $data = $stmt->fetchAll();
+
+
+        return $this->renderer->render($response, 'facturaxpagar.phtml', $data);
+    }
+
+    public function abono(Request $request, Response $response, $args){                
+        
+        $data = array();
+      
+        $ban = $this->ventor->prepare("select CODIBANC, NOMBBANC FROM tbana");
+        $ban->execute();
+        $data = $ban->fetchAll();  
+        $montoPag=$this->db->prepare("select NUMEDOCU,MONTO from tcfactpagar WHERE  NUMEDOCU = :nume");
+        $montoPag->bindParam("nume", $args['factura']);
+        $montoPag->execute();
+        $fetch= $montoPag->fetchAll();
+
+        
+        return $this->renderer->render($response, 'abono.phtml', array('banco'=>$data, 'factmon'=>$fetch, 'factura'=>$args['factura'],'monto'=>$args['monto']));
+    }
+
+    public function pagosfactura(Request $request, Response $response, $args){
+
+        $data = array();
+        $stmt = $this->db->prepare("SELECT a.id, a.NUMEDOCU, a.DESCRI, DATE(a.FECHA) as FECHA, a.MONTO, b.NOMBBANC, a.IMAGEN, c.nombretpago FROM tcfactpagar a inner join tbana b on a.BANCO = b.CODIBANC inner join tpago c on a.TPAGO = c.id where a.numedocu= :nume  and a.codiclie= :idcliente");
+        $stmt->bindParam("nume", $args['factura']);
+        $stmt->bindParam("idcliente", $_SESSION["user"]["info"]["CLIEV_IDCLIENTE"]);
+        $stmt->execute();
+        $data = $stmt->fetchAll();
+        $data['factura']= $args['factura'];
+        return $this->renderer->render($response, 'pagos.phtml', $data);
+    }
+
+    public function cpantalla(Request $request, Response $response, $args){
+
+        $data = array();
+        $stmt = $this->db->prepare("SELECT a.id,  a.IMAGEN FROM tcfactpagar a where a.id= :pagos");
+        $stmt->bindParam("pagos", $args['pagos']);
+        //$stmt->bindParam("idcliente", $_SESSION["user"]["info"]["CUENV_IDCUENTA"]);
+        $stmt->execute();
+        $data = $stmt->fetch();      
+        return $this->renderer->render($response, 'cpantalla.phtml', $data);
+    }
+    
+
+    public function pagosday(Request $request, Response $response, $args){
+
+        $data = array();
+        $stmt = $this->ventor->prepare("SELECT a.id, a.NUMEDOCU, a.DESCRI, DATE(a.FECHA) as FECHA, a.MONTO, b.NOMBBANC, a.IMAGEN, c.NOMBCLIE, c.CODICLIE, e.nombretpago FROM webs4gcom.tcfactpagar a 
+        inner join webs4gcom.tbana b on a.BANCO = b.CODIBANC INNER JOIN ventoradm001.tcpca c on a.CODICLIE = c.CODICLIE 
+        INNER JOIN ventoradm001.tcpcc d on a.NUMEDOCU = d.NUMEDOCU INNER JOIN webs4gcom.tpago e on e.id = a.TPAGO 
+        where trim(d.CODIRUTA) = :ruta  and DATE(a.FECHA) BETWEEN :fechaini and :fechafin ORDER BY a.FECHA desc");
+        $stmt->bindParam("ruta", $args['rutas']);
+        $stmt->bindParam("fechaini", $args['fechaini']);        
+        $stmt->bindParam("fechafin", $args['fechafin']);        
+        $stmt->execute();
+        $data = $stmt->fetchAll();
+        return $response->withJson($data);
+        
+        //return $this->renderer->render($response, 'lispagos.phtml', $data);
+    }
+
+    public function fpagosday(Request $request, Response $response, $args){
+
+        $data = array();
+        $stmt = $this->ventor->prepare("SELECT CODIRUTA FROM truta");
+        $stmt->execute();
+        $data = $stmt->fetchAll();
+        return $this->renderer->render($response, 'fpagos.phtml', $data);
+    }
+
+    public function create(Request $request, Response $response, $args)
+    {      
+        $logo=str_replace(' ','_',$_FILES['imagen']["name"]);
+        
+        $direccion = './imagen/';
+        mkdir($direccion, 0777, true);
+        $archivo_temporal= $_FILES['imagen']["tmp_name"];
+        $user=$_SESSION["user"]["info"]["CLIEV_IDCLIENTE"];
+        $nombre= $direccion.$user.$logo;
+        
+        if (is_uploaded_file($archivo_temporal))
+        {
+            if(copy($archivo_temporal, $nombre))
+                $archivo=$logo;
+            else
+                $archivo='';
+         }
+         //return var_dump($archivo);   
+         $input = $request->getParsedBody();                       
+      
+         $sql = "INSERT INTO `tcfactpagar`(`NUMEDOCU`, `FECHA`, `MONTO`,`DESCRI`, `CODICLIE`, `BANCO`, `TPAGO`, `IMAGEN`) VALUES (:numedocu, :fecha, :monto, :descri, :codiclie, :banco, :tpago, :imagen)";
+                     
+
+            $nombre="../".$nombre;
+            if($logo==""){
+               $nombre="";
+            }
+            $stmt = $this->db->prepare($sql);
+            $fechahoy =date("Y")."/".date("m")."/".date("d");
+            $stmt->bindParam("numedocu", $input['nume']);        
+            $stmt->bindParam("fecha", $fechahoy);
+            $stmt->bindParam("monto", $input['monto']);
+            $stmt->bindParam("descri", $input['descri']);
+            $stmt->bindParam("banco", $input['banco']);        
+            $stmt->bindParam("tpago", $input['tpago']);                    
+            $stmt->bindParam("imagen", $nombre);
+            $stmt->bindParam("codiclie", $_SESSION["user"]["info"]["CLIEV_IDCLIENTE"]);
+
+            $stmt->execute();       
+           
+    }
+
+    public function createFact(Request $request, Response $response, $args)
+    {    
+           $factura = array();
+           $monto = array();
+           $factura = explode(',', $args['factura'] );
+           $monto = explode(',', $args['montos'] );
+            $data = array();
+            $ban = $this->ventor->prepare("select CODIBANC, NOMBBANC FROM tbana");
+            $ban->execute();
+            $data = $ban->fetchAll();
+       
+            $fac=str_replace(',', "','", $args['factura']);
+                 $montoPag=$this->db->prepare("select NUMEDOCU,MONTO from tcfactpagar WHERE  NUMEDOCU IN ('$fac')");
+                 $montoPag->execute();
+                 $fetch= $montoPag->fetchAll();
+           
+           return $this->renderer->render($response, 'abonos.phtml', array("facturas"=>$factura,"bancos"=>$data, "montos"=>$monto, "abono"=>$fetch));
+    }  
+
+     public function creates(Request $request, Response $response, $args)
+    {    
+        $logo=str_replace(' ','_',$_FILES['imagen']["name"]);
+        
+        $direccion = './imagen/';
+        mkdir($direccion, 0777, true);
+        $archivo_temporal= $_FILES['imagen']["tmp_name"];
+        $user=$_SESSION["user"]["info"]["CLIEV_IDCLIENTE"];
+        $nombre= $direccion.$user.$logo;
+        
+        if (is_uploaded_file($archivo_temporal))
+        {
+            if(copy($archivo_temporal, $nombre))
+                $archivo=$logo;
+            else
+                $archivo='';
+         }
+         
+        $input = $request->getParsedBody();    
+        //$rmontos= array();                   
+        //$rmontos= rsort($input['nmontos']);
+        //return var_dump($input);   
+        $num= (int) count($input['nmontos']);
+        $i=0;
+        $saldo=0;
+        $ban=0;
+       // return var_dump($input);  
+        
+        foreach ($input['nume'] as $valor) {
+            
+            $sql = "INSERT INTO `tcfactpagar`(`NUMEDOCU`, `FECHA`, `MONTO`,`DESCRI`, `CODICLIE`, `BANCO`, `TPAGO`, `IMAGEN`) VALUES (:numedocu, :fecha, :monto, :descri, :codiclie, :banco, :tpago, :imagen)";
+                             
+            $nombre="../".$nombre;
+            if($logo==""){
+               $nombre="";
+            }   
+
+            $dat = array(); 
+            $query= "SELECT SUM(MONTO) AS MONTO FROM tcfactpagar WHERE numedocu=:nume AND CODICLIE=:codiclie";  
+            $abonoc=$this->db->prepare($query);
+            $abonoc->bindParam("nume", $valor);
+            $abonoc->bindParam("codiclie", $_SESSION["user"]["info"]["CLIEV_IDCLIENTE"]);
+            $abonoc->execute();
+            $dat = $abonoc->fetch();
+
+            //
+            $abono= (double) $dat['MONTO'];
+            
+                                //3,207,661.97 - 1000,000 > 2600000
+               if (($input['nmontos'][$i]-$abono)>= $input['monto']){                        
+                            // $abono=$abono+$input['monto'];                             
+                          //return var_dump($input['nmontos'][$i]);
+                              $stmt = $this->db->prepare($sql);
+                                $fechahoy =date("Y")."/".date("m")."/".date("d");
+                                $stmt->bindParam("numedocu", $valor);          
+                                $stmt->bindParam("fecha", $fechahoy);
+                                $stmt->bindParam("monto", $input['monto']);
+                                $stmt->bindParam("descri", $input['descri']);
+                                $stmt->bindParam("banco", $input['banco']);        
+                                $stmt->bindParam("tpago", $input['tpago']);                    
+                                $stmt->bindParam("imagen", $nombre);
+                                $stmt->bindParam("codiclie", $_SESSION["user"]["info"]["CLIEV_IDCLIENTE"]);               
+                                $stmt->execute();    
+                                $i++;
+                                $input['monto']=0;    
+                             break;
+                            
+                }
+
+                else{       //3,207,661.97 - 1000,000 > 2600000
+                            $abono=$input['nmontos'][$i]-$abono;                           
+                            $input['monto']  = $input['monto']-$abono; 
+                            // return var_dump($input['monto']);
+                            $stmt = $this->db->prepare($sql);
+                            $fechahoy =date("Y")."/".date("m")."/".date("d");
+                            $stmt->bindParam("numedocu", $valor);          
+                            $stmt->bindParam("fecha", $fechahoy);
+                            $stmt->bindParam("monto", $abono);
+                            $stmt->bindParam("descri", $input['descri']);
+                            $stmt->bindParam("banco", $input['banco']);        
+                            $stmt->bindParam("tpago", $input['tpago']);                    
+                            $stmt->bindParam("imagen", $nombre);
+                            $stmt->bindParam("codiclie", $_SESSION["user"]["info"]["CLIEV_IDCLIENTE"]);               
+                            $stmt->execute();    
+                            $i++;     
+                                                          
+                            
+                }
+        }   
+    }
+     public function artnuevs(Request $request, Response $response, $args)
+    {    
+        
+       // return $this->renderer->render($response, 'artnuevs.phtml', $data);
+    }  
+    public function artdesct(Request $request, Response $response, $args)
+    {
+        $ini=0;
+        $limit=27;
+        $pag=1;
+        
+        
+        $data = array();
+        $stmt = $this->ventor->prepare("SELECT tinva.CODIPROD, tinva.CODIPROV,  tinva.DESCPROD FROM `tinva` WHERE DESACTIV = 1 ");
+        $stmt->execute();
+        $data = $stmt->fetchAll();
+        $size=count($data);
+        
+        if(!empty($args['pag'])){
+            $pag=$args['pag'];
+            $ini=($pag * $limit);
+        }
+        
+        
+        $fecha=date("Y-m-d");
+        $data = array();
+        $stmt = $this->ventor->prepare("SELECT tinva.CODIPROD, tinva.CODIPROV,  tinva.DESCPROD FROM `tinva` WHERE DESACTIV = 1 limit :init , :limit");
+        $stmt->bindParam("init", $ini);
+        $stmt->bindParam("limit",$limit);
+        $stmt->execute();
+        $data['desc'] = $stmt->fetchAll();
+        
+        for($i=0;$i< count($data['desc']);$i++){
+            $img=array("IMGV_IMAGEN1"=>'', "IMGV_IMAGEN2"=>'', "IMGV_IMAGEN3"=>'', "IMGV_IMAGEN4"=>'', "IMGV_IMAGEN5"=>'');
+            $stmt = $this->db->prepare("SELECT tart_imagenes.IMGV_IMAGEN1, tart_imagenes.IMGV_IMAGEN2, tart_imagenes.IMGV_IMAGEN3, tart_imagenes.IMGV_IMAGEN4, tart_imagenes.IMGV_IMAGEN5 FROM `tart_imagenes` where IMGV_IDARTICULO = :idimage");
+            $stmt->bindParam("idimage", $data['desc'][$i]['CODIPROD']);
+            $stmt->execute();
+            if( $stmt->fetch() ){
+                $img = $stmt->fetch();
+            }
+            $data['desc'][$i]=array_merge($data['desc'][$i],$img);
+        }
+        
+        $data['size']=$size;
+        $data['pag']=$pag;
+        return $this->renderer->render($response, 'artdesct.phtml', $data);
+    }
+    function detail_fact(Request $request, Response $response, $args){
+        $data = array();
+        $stmt = $this->ventor->prepare("SELECT CODICLIE,CODIRUTA,DIAVISI,TIPOPREC,FORMPAGO,FORMPAGO1,FORMPAGO2,DIASCRED,LIMICRED FROM tcpcarut where CODICLIE = :idcliente ");
+        $stmt->bindParam("idcliente",$_SESSION["user"]["CUENV_USUARIO"]);
+        $stmt->execute();
+        $data = $stmt->fetch();
+        return $response->withJson($data);
+    }
+    function vencidos(Request $request, Response $response, $args){
+        $data = array();
+        $stmt = $this->ventor->prepare("SELECT tcpcc.NUMEDOCU, DATE_FORMAT(FECHA, '%Y-%m-%d') AS FECHA, DATE_FORMAT(FECHVENC, '%Y-%m-%d') AS FECHVENC, DATE_FORMAT(FENTREGA, '%Y-%m-%d') AS FENTREGA, DATE_FORMAT(FVENCMTO, '%Y-%m-%d') AS FVENCMTO, FDIASCRE, MONTO, CODICLIE FROM `tcpcc` WHERE   FVENCMTO < NOW() AND FENTREGA > '0000-00-00' AND CODICLIE = :idclient and (MONTO - ABONOS)  >0");
+        $stmt->bindParam("idclient",$_SESSION["user"]["CUENV_USUARIO"]);
+        $stmt->execute();
+        $data = $stmt->fetchAll();
+        return $this->renderer->render($response, 'vencidos.phtml', $data);
+    }
+    function limites(Request $request, Response $response, $args){
+        $data = array();
+        $stmt = $this->ventor->prepare("SELECT tcpcarut.CODICLIE, tcpcarut.DIAVISI, tcpcarut.TIPOPREC, tcpcarut.FORMPAGO, tcpcarut.DIASCRED, tcpcarut.LIMICRED, tcpcc.NUMEDOCU, DATE_FORMAT(tcpcc.FECHA, '%Y-%m-%d') AS FECHA, DATE_FORMAT(tcpcc.FECHVENC, '%Y-%m-%d') AS FECHVENC, DATE_FORMAT(tcpcc.FENTREGA, '%Y-%m-%d') AS FENTREGA, DATE_FORMAT(tcpcc.FVENCMTO, '%Y-%m-%d') AS FVENCMTO, tcpcc.FDIASCRE, tcpcc.MONTO, tcpcc.CODICLIE, tcpcc.ABONOS, DATE_FORMAT(ADDDATE(tcpcc.FENTREGA, INTERVAL tcpcarut.DIASCRED DAY),'%Y-%m-%d') as vencido, SUM(tcpcc.ABONOS) AS totalbonos, (tcpcarut.LIMICRED - SUM(tcpcc.MONTO)) as credito FROM tcpcarut INNER JOIN tcpcc ON tcpcarut.CODICLIE = tcpcc.CODICLIE WHERE tcpcc.CODICLIE = :idclient AND FENTREGA > '0000-00-00'  GROUP BY tcpcc.CODICLIE");  
+        $stmt->bindParam("idclient",$_SESSION["user"]["CUENV_USUARIO"]);
+        $stmt->execute();
+        $data = $stmt->fetchAll();
+        return $response->withJson($data);
+    }
+
+
+    function asignarmod(Request $request, Response $response, $args){
+        $data = array();
+        $stmt = $this->db->prepare("select b.CODICLIE, b.NOMBCLIE from webs4gcom.tcuentas_cli a INNER JOIN ventoradm001.tcpca b on a.CRCV_IDCLIENTE=b.CODICLIE GROUP BY b.CODICLIE, b.NOMBCLIE");
+        $stmt->execute();
+        $data = $stmt->fetchAll();
+        return $this->renderer->render($response, 'asignarmod.phtml', $data);
+    }
+
+    function asignarmodpro(Request $request, Response $response, $args){
+        $data = array();
+        $stmt = $this->db->prepare("select a.ID, a.NOMBRE from tmodulos a LEFT OUTER JOIN  tmodcta b on a.ID=b.MOD where b.TCUENTA = :iduser");
+        $stmt->bindParam('iduser', $args['user']);
+        $stmt->execute();
+        $data = $stmt->fetchAll();
+
+        return $this->renderer->render($response, 'asignarmodpro.phtml', $data);
+    }
+    function promociones(Request $request, Response $response, $args){
+      $data = array();
+        return $this->renderer->render($response, 'promociones.phtml', $data);
+    }
+    
+    function admlimit(Request $request, Response $response, $args){
+      $data = array();
+        return $this->renderer->render($response, 'admlimit.phtml', $data);
+    }
+    function admproduct(Request $request, Response $response, $args){
+      $data = array();
+        return $this->renderer->render($response, 'admproduct.phtml', $data);
+    }
+    function admprov(Request $request, Response $response, $args){
+      $data = array();
+        return $this->renderer->render($response, 'admprov.phtml', $data);
+    }
+}
+

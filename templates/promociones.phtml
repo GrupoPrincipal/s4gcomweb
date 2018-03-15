@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+<link rel="stylesheet" href="<?php echo DOMAIN_ROOT ?>js/jquery-ui/jquery-ui.theme.css" />
+<script src="<?php echo DOMAIN_ROOT ?>js/jquery-ui/jquery-ui.js"></script>
+<script src="<?php echo DOMAIN_ROOT ?>js/filesaver.js"></script>
+<script src="<?php echo DOMAIN_ROOT ?>js/html2canvas.js"></script>
+<script src="<?php echo DOMAIN_ROOT ?>js/ckeditor.js"></script>
+<link rel="stylesheet" href="<?php echo DOMAIN_ROOT ?>js/daterangepicker/daterangepicker.css" />
+<script src="<?php echo DOMAIN_ROOT ?>js/daterangepicker/moment.js"></script>  
+<script src="<?php echo DOMAIN_ROOT ?>js/daterangepicker/daterangepicker.js"></script>
+
+
+</head>
+
+<body>
+  <div data-role="page" id="admin-main-page" style="background-color: #DAE0EE">
+  	<div data-role="header" style="background-image: url(images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+       <?php  include("header_mercadeo.phtml"); ?>
+        <a href="#" data-rel="back" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Volver</a>
+    </div>
+    <div role="main" class="ui-content">   
+       <br><br>
+       <div class="row">
+           
+           
+               <div class="Herramientas col-md-10 col-md-offset-1">
+                   Titulo:
+                   <input type="text" id="titulo" placeholder="Titulo"  name="titulo"  />
+                   Periodo de promocion activa:
+                   <input type="text" id="daterange" name="daterange" value="<?php echo date("Y/m/d - Y/m/d") ?>" />
+               </div>
+           <div id="edit-promo">
+               <div class="Herramientas col-md-10 col-md-offset-1">
+                    <b class="btn btn-default" onclick="herramienta(1)">Añadir contenedor</b>
+                    <b class="btn btn-default" style=' text-align: right; width: 115px;background-repeat: no-repeat;background-position: left;background-size: contain;background-image: url("<?php echo DOMAIN_ROOT ?>images/gdp_icon.png"); ' onclick="herramienta(2)">Icono</b>
+                    <b class="btn btn-default" style='text-align: right;    width: 115px;background-repeat: no-repeat;background-position: left;background-size: contain;background-image: url("<?php echo DOMAIN_ROOT ?>images/logo.png");' onclick="herramienta(6)">Logo</b>
+                    <b class="btn btn-default" onclick="herramienta(4)">Añadir texto</b>
+                    <b style="display: inline-block;"><input type="color" style="width: 50px;" class="btn-color color" onchange="herramienta(3)"></b>
+
+               </div>
+               <div class="lienzo col-md-10 col-md-offset-1 " id="lienzo" style="padding:0 !important">
+
+               </div>
+           </div>
+           <div class="Herramientas col-md-10 col-md-offset-1">
+               <div class="portlet light bordered " >
+                    <div class="portlet-title portlet-proveedores">
+                        <div class="caption">Descripcion de la promocion:</div>
+                        &nbsp; &nbsp; &nbsp; &nbsp;
+                    </div>
+                   <div class="portlet-title">
+                       <div class="adjoined-bottom">
+                        <div class="grid-container">
+                            <div class="grid-width-100">
+                                <textarea id="editor" placeholder="Descripcion de la promocion" name="description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                   </div>
+                </div>
+               <br>
+               <center><b class="btn btn-primary" onclick="herramienta(7)">Guardar promocion</b></center>
+           </div>
+        </div>
+           <div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF">
+                   <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+
+            </div>
+    
+      </div>
+ </div>
+<script>
+
+function preview(e,pos){
+    var Archivos,Lector;
+   Archivos = jQuery(e)[0].files;
+    console.log(Archivos);
+    
+    Lector = new FileReader();
+		Lector.onloadend = function(e){
+			var origen,tipo;
+			//Envía la imagen a la pantalla
+			origen = e.target; //objeto FileReader
+            console.log('#lienzo-contenedor-div-'+pos);
+			//jQuery('#lienzo-contenedor-div-'+pos).attr('src', origen.result); solo aplica a las etiquetas img
+            jQuery('#lienzo-contenedor-div-'+pos).children('img').remove();
+			jQuery('#lienzo-contenedor-div-'+pos).append("<img class='img-cont-div' style='width:100%;height:100%;' src='"+origen.result+"'>");
+		};
+		Lector.onerror = function(e){
+			console.log(e)
+		}
+		Lector.readAsDataURL(Archivos[0]); 
+}
+    
+$(function(){
+    $(".lienzo").resizable();
+    var start = moment();
+    $('#daterange').daterangepicker({
+        locale: {
+            applyLabel:"Aceptar",
+            cancelLabel: "Cancelar",
+            customRangeLabel: "Otro rango",
+            format: 'YYYY/MM/DD'
+        },
+        startDate: start,
+        minDate: start,
+        ranges: {
+           'Hoy': [moment(), moment()],
+           '7 dias': [moment(), moment().subtract(-6, 'days')],
+           '30 dias': [moment(), moment().subtract(-29, 'days')],
+           'Por este mes': [moment().startOf('month'), moment().endOf('month')],
+        }
+        
+    });
+    var editor = CKEDITOR.replace("editor");
+    CKEDITOR.editorConfig = function( config ) {
+        config.language = 'es';
+        config.uiColor = '#F7B42C';
+        config.height = 300;
+        config.toolbarCanCollapse = true;
+    };
+})
+function editardiv(e){
+    if($(".icono-editar").length == 0){
+        $(e).prepend("<b style='position: absolute;right: 12px; top:-8px;' class=' ui-icon-edit ui-btn-icon-top icono-editar' onclick='loadedit(this)'></b>");
+    }
+    removdiv(e);
+}
+function removeedit(e){
+    $(e).children('b').remove();
+}
+
+//icono para remover divs
+function removdiv(e){
+    if($(".icono-delete").length == 0)
+        $(e).prepend("<b style='position: absolute;left: 12px; top:-8px;' class=' ui-icon-delete ui-btn-icon-top icono-delete' onclick='remover(this)'></b>");
+
+}
+function removerdiv(e){
+    $(e).children('b').remove();
+}
+function removerfuente(e){
+    $(e).children('.fuente').remove();
+}
+function remover(e){
+    $(e).parent('div').remove();
+}
+    
+function loadedit(e){
+    var element=$(e).parent('.lienzo-contenedor-div');
+    var pos = $(e).parent('.lienzo-contenedor-div').data('count');
+    $.jAlert({
+        'type': 'confirm', 
+        'confirmQuestion': "<input type='file' name='file' onchange='preview(this,"+pos+")'>",
+        confirmBtnText:"Agregar",
+        denyBtnText:"Cancelar",
+        'onConfirm': function(){
+           
+            
+        }
+     });
+}
+function herramienta(h,e1){
+    var e=$('.lienzo');
+    switch(h) {
+        case 1:
+            var numElem = $('.lienzo-contenedor-div').size();
+            numElem=numElem+1;
+            e.append("<div class='lienzo-contenedor-div ' id='lienzo-contenedor-div-"+numElem+"' onmouseleave='removeedit(this)' data-count='"+numElem+"' onmouseenter='editardiv(this)'></div>");
+            $(".lienzo-contenedor-div").draggable({ containment: "parent"});
+            $(".lienzo-contenedor-div").resizable({
+                helper: "ui-resizable-helper",
+                ghost: true
+            });
+            break;
+        case 2:
+            //var style=' height:100px;width: 100px;background-repeat: no-repeat;background-position: left;background-size: cover;background-image: url("<?php echo DOMAIN_ROOT ?>images/gdp_icon.png")';
+            var div="<div onmouseenter='removdiv(this)' onmouseleave='removerdiv(this)' class='lienzo-icono' style='height:100px;width: 100px;border-style: dashed; border:solid;border-width:1px;position:absolute;'><img style='width:100%;height:100%' src='<?php echo DOMAIN_ROOT ?>images/gdp_icon.png' ></div>";
+            $('.lienzo').append(div);
+            $('.lienzo-icono').resizable();
+            $('.lienzo-icono').draggable({ containment: "parent"});
+            break;
+        case 3:
+            var c = $(".color").val();
+            e.css({"background-color":c});
+            break;
+        case 4:
+            e.append("<div onmouseenter='removdiv(this)'onmouseleave='removerfuente(this)' onmouseleave='removerdiv(this)' class='text-content' style='position:absolute'><textarea class='texto text-lienzo' onfocus='options(this)'></textarea></div>");
+            break;
+        case 5:
+            var c =$(e1).val();
+            $(e1).css({"color":c});
+            break;
+        case 6:
+                    
+            var div="<div onmouseenter='removdiv(this)' onmouseleave='removerdiv(this)' class='lienzo-logo' style='height:100px;width: 100px;border-style: dashed; border:solid;border-width:1px;position:absolute;'><img style='width:100%;height:100%' src='<?php echo DOMAIN_ROOT ?>images/logo.png' ></div>";
+            $('.lienzo').append(div);
+            $('.lienzo-logo').resizable();
+            $('.lienzo-logo').draggable({ containment: "parent"});
+            break;
+        case 7:
+            $('.icono-mas-menos').remove();
+            $('.fuente').remove();
+            $('.lienzo').children('.ui-icon-gripsmall-diagonal-se').remove();
+            $('.lienzo').children('div').css({"border":"none"});
+            $('.lienzo').children('div').children('.ui-icon-gripsmall-diagonal-se').remove();
+             var fechas=$('#daterange').val();
+             var titulo=$('#titulo').val();
+             var contenido = CKEDITOR.instances.editor.getData();
+            
+            html2canvas($("#lienzo"), {
+                  onrendered: function(canvas) {
+                     // theCanvas = canvas;
+                     // document.body.appendChild(canvas);
+                      /*
+                      canvas.toBlob(function(blob) {
+                          console.log(blob);
+                        saveAs(blob, "Dashboard.png"); 
+                      });
+                      */
+                      if(titulo == '' || contenido =='' ){
+                          alert("Debe indicar el titulo y contenido de la promocion");
+                      }else{
+                         image = canvas.toDataURL("image/png"); // data:image/png....
+                         // $('#prueba-imga').text(image);
+                            var data= "imagen="+image+"&fechas="+fechas+"&content="+contenido+"&titulo="+titulo;
+                             $.ajax({
+                              url: server + "savepromo",
+                              type: "post",
+                                data: data,
+                                 dataType: "json",
+                                }).done(function(response){
+
+                                 console.log(response);
+                             });
+                         }
+                  }
+              });
+            break;
+    }
+}
+
+    
+function options(e){
+    $(e).parent('div').draggable({ containment: "parent"});
+    $(e).addClass('text-selected');
+    $(e).parent('.text-content').addClass('content-selected');
+    
+   if($(".fuente").length == 0){
+        var list='';
+        
+        for(i=10;i<100;i++){
+            list+="<option value="+i+">"+i+"</option>";
+        }
+        var fuente='';
+        fuente+="<option value='algerian' style='font-family:algerian;' >Algerian</option>";
+        fuente+="<option value='arial' style='font-family:arial;' >Arial</option>";
+        fuente+="<option value='Blackadder ITC' style='font-family:Blackadder ITC;' >Blackadder ITC</option>";
+        fuente+="<option value='catesllar' style='font-family:catesllar;' >Castellar</option>";
+        fuente+="<option value='chiller' style='font-family:chiller;' >Chiller</option>";
+        fuente+="<option value='comic sans ms' style='font-family:comic sans ms;' >Comic sans ms</option>";
+        fuente+="<option value='Curlz MT' style='font-family:Curlz MT;' >Curlz MT</option>";
+        fuente+="<option value='Edwardian Script ITC' style='font-family:Edwardian Script ITC;' >Edwardian Script ITC</option>";
+        fuente+="<option value='French Script MT' style='font-family:French Script MT;' >French Script MT</option>";
+        fuente+="<option value='georgia' style='font-family:georgia;' >Georgia</option>";
+        fuente+="<option value='times new roman' style='font-family:times new roman;' >Times new roman</option>";
+        fuente+="<option value='Monotype Corsiva' style='font-family:Monotype Corsiva;' >Monotype Corsiva</option>";
+        fuente+="<option value='verdana' style='font-family:verdana;' >Verdana</option>";
+       
+       
+        var filters ='<div class="fuente" > <input type="color" onchange="colortext(this)" name="color" class="colortext"><select onchange="fuente(this)">'+fuente+'</select><select onchange="textsize(this)">'+list+'</select> <i class="tipotext btn btn-default" onclick="tipotext(1,this)">B</i> <b style=" font-weight: bold;" class="tipotext btn btn-default"  onclick="tipotext(2,this)">B</b> <span class="tipotext btn btn-default" onclick="tipotext(3,this)"> B </span>  </div>';
+        $(e).parent('.text-content').prepend(filters);
+        
+    }
+}
+function filtros(e){
+    if($(".fuente").length == 0){
+        var list='';
+        
+        for(i=10;i<100;i++){
+            list+="<option value="+i+">"+i+"</option>";
+        }
+        
+        var filters ='<div class="fuente" > <input type="color" onchange="colortext(this)" name="color" class="colortext"><select onchange="textsize(this)">'+list+'</select> <i class="tipotext btn btn-default" onclick="tipotext(1,this)">B</i> <b style=" font-weight: bold;" class="tipotext btn btn-default"  onclick="tipotext(2,this)">B</b> <span class="tipotext btn btn-default" onclick="tipotext(3,this)"> B </span>  </div>';
+        $(e).parent('.text-content').prepend(filters);
+        $(e).remove();
+    }
+}
+function removefiltros(e){
+        $(e).parent('.text-content').children('.fuente').remove();
+        $(e).remove();
+}
+
+function tipotext(t,e){
+    $('.tipotext').removeClass('active');
+    $(e).addClass('active');
+    if(t==1)
+        $(e).parent('.fuente').parent('.text-content').children('.text-lienzo').css({"font-style":"oblique"}); 
+    if(t==2)
+        $(e).parent('.fuente').parent('.text-content').children('.text-lienzo').css({"font-weight":"bolder"});
+    if(t==3){
+        $(e).parent('.fuente').parent('.text-content').children('.text-lienzo').css({"font-weight":"normal"});
+        $(e).parent('.fuente').parent('.text-content').children('.text-lienzo').css({"font-style":"normal"});
+    }
+    
+}
+function colortext(e){
+    var color =$(e).val();
+    $(e).parent('.fuente').parent('.text-content').children('.text-lienzo').css({"color": color}); 
+}
+function textsize(e){
+    var tam =$(e).val();
+    $(e).parent('.fuente').parent('.text-content').children('.text-lienzo').css({'font-size': tam+'px'}); 
+}
+function fuente(e){
+    var font =$(e).val();
+    $(e).parent('.fuente').parent('.text-content').children('.text-lienzo').css({'font-family': font}); 
+}
+</script>
+</body>
+</html>

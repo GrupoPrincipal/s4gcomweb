@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+</head>
+
+<body>
+  <div data-role="page" id="admin-main-page" style="background-color: #DAE0EE">
+  	<div data-role="header" style="background-image: url(images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+       <?php   include("headeradm.phtml");   ?>
+        <a href="#" data-rel="back" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Volver</a>
+    </div>
+    <div role="main" class="ui-content">   
+       <br><br>
+       <div class="row">
+       <div class="col-md-10 col-md-offset-1" id="listado">
+       <div role="main" class="ui-content">
+            <div data-role="collapsibleset">
+            <h2>Clientes Usuarios</h2>
+                <table id="" class="display" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>                          
+                            <th>Codigo</th>
+                            <th>Nombre</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                     <tbody>                      
+                        <?php 
+                        foreach($data as $d){ ?>
+                        <tr>                            
+                            <td><?php echo $d['CODICLIE']; ?></td>
+                            <td><?php echo $d['NOMBCLIE']; ?></td>
+                            <td><center><a href="asignarmodpro/<?php echo $d['CODICLIE']; ?>" data-role="button" class="btn btn-primary btn-sm" transition="flip" data-rel="dialog" data-theme="d" title="Modulos">Modulos</a></center></td>
+                        </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>  
+            </div>
+        </div>      	        
+            <div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF">
+       <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+   
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+ $(function(){
+    $('table.display').DataTable();
+ })
+ </script>
+</body>
+</html>

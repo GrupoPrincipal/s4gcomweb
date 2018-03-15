@@ -1,0 +1,58 @@
+<?php 
+$title="Inicio";
+$dia=array(1=>"Lunes",2=>"Martes",3=>"Miercoles",4=>"Jueves",5=>"Viernes",6=>"Sabado",7=>"Domingo");
+
+?>
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+</head>
+
+<body>
+    <b  class='capture-metadata' data-sesion='0'></b>
+  <div data-role="page" id="admin-ini-page" >
+  	<div data-role="header" style="background-image: url(images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+        <?php include("header.phtml"); ?>
+    </div>
+      <!-- ## Contenedor principal ## -->
+    <div role="main" class="ui-content">
+<br><br>
+<div class="row">
+    <div class="col-md-10 col-md-offset-1">        
+        
+        <div role="main" class="ui-content">
+          <div data-role="collapsibleset" class="list-fecturas" >
+               <ul data-role="listview"  data-inset="true" class="listview">
+                    <li><table  class="lista-table"><tr><th style="width:20%;">Usuario</th><th style="width:40%;">Departamento</th><th style="width:40%;">Cargo</th></tr></table></li>
+                   <?php foreach($data as $d){ ?>
+                        <li>
+                            <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" onclick="redirect('./permiso/<?php echo $d['codecarg']; ?>')" href="#">
+                                <table  class="lista-table"><tr><th style="width:20%;text-align:center;"><?php echo $d['codecarg']; ?></th><th style="width:40%;text-align:center;"><?php echo $d['departamento']; ?></th><th style="width:40%;text-align:center;"><?php echo $d['cargo']; ?></th></tr></table>
+                            </a>
+                        </li>
+                   <?php } ?>
+               </ul>
+          </div>
+        </div>
+        
+        
+    </div>
+</div>
+
+<script>
+ $(function(){
+     
+ });
+
+</script>
+
+  </div>
+      <!-- ## FIN contenedor principal ## -->
+      
+  	<div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF;">
+      <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+    </div>
+  </div>
+</body>
+</html>

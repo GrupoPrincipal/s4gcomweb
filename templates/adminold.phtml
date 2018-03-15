@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>S4GCOMWEB</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css" />
+  <link rel="stylesheet" href="css/app.css" />
+  <script src="js/jquery-2.1.4.min.js"></script>
+  <script src="js/jquery.mobile-1.4.5.min.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/app.js"></script>
+  <link rel="shortcut icon" href="images/gdp.png" />
+</head>
+
+<body>
+  <div data-role="page" id="admin-main-page" style="background-color: #DAE0EE">
+  	<div data-role="header" style="background-color: #004372; color: #DAE0EE">
+      <h1>Módulo Administrativo</h1>
+      <a href="#!" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-power logout-action">Salir</a>
+    </div>
+    <div role="main" class="ui-content">
+      <ul data-role="listview" data-inset="true">
+        <li><a href="#new-account-page">Crear nueva cuenta</a></li>
+        <li><a href="#update-account-page">Actualizar / Eliminar Cuentas</a></li>
+      </ul>
+    </div>
+  	<div data-role="footer" data-position="fixed" style="background-color: #0188C8; color: #FFFFFF">
+      <h4>s4GcomWeb © Seu4 Plus 2017</h4>
+    </div>
+  </div>
+
+  <div data-role="page" id="new-account-page" style="background-color: #00639E">
+  	<div data-role="header" style="background-color: #004372; color: #DAE0EE">
+      <a href="#" data-rel="back" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Volver</a>
+      <h1>Crear Usuario</h1>
+    </div>
+    <div role="main" class="ui-content">
+      <form type="POST" action="account" id="new-account-form">
+        <ul data-role="listview" data-inset="true">
+          <li class="ui-field-contain"  style="background-color: #DAE0EE">
+            <label>Usuario:</label>
+            <input type="text" name="username" value="" data-clear-btn="true">
+          </li>
+          <li class="ui-field-contain" style="background-color: #DAE0EE">
+            <label>Password:</label>
+            <input type="password" name="password" value="" data-clear-btn="true">
+          </li>
+          <li class="ui-field-contain ui-option-a"  style="background-color: #DAE0EE">
+            <label>Empresa:</label>
+            <select name="company"></select>
+          </li>
+          <li class="ui-field-contain"  style="background-color: #DAE0EE">
+            <label>Tipo de Usuario:</label>
+            <select name="type">
+              <option value="1">Vendedor</option>
+              <option value="2">Cliente</option>
+            </select>
+          </li>
+          <li class="ui-field-contain ui-option-b"  style="background-color: #DAE0EE">
+            <label>Cliente:</label>
+            <input name="client" id="new-account-client-autocomplete" data-type="search" placeholder="Buscar cliente...">
+            <ul data-role="listview" data-filter="true" data-filter-reveal="true" data-input="#new-account-client-autocomplete"></ul>
+          </li>
+          <li class="ui-field-contain ui-option-a"  style="background-color: #DAE0EE">
+            <label>Vendedor:</label>
+            <select name="seller"></select>
+          </li>
+          <li class="ui-field-contain" style="background-color: #DAE0EE">
+            <button type="submit" class="ui-btn ui-corner-all ui-btn-a">Aceptar</button>
+          </li>
+        </ul>
+      </form>
+    </div>
+  	<div data-role="footer" data-position="fixed" style="background-color: #0188C8; color: #FFFFFF">
+      <h4>s4GcomWeb © Seu4 Plus 2017</h4>
+    </div>
+  </div>
+
+  <div data-role="page" id="update-account-page" style="background-color: #DAE0EE">
+  	<div data-role="header" style="background-color: #004372; color: #DAE0EE">
+      <a href="#" data-rel="back" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Volver</a>
+      <h1>Actualizar / Eliminar Usuarios</h1>
+    </div>
+    <div role="main" class="ui-content">
+      <ul data-role="listview" data-inset="true"></ul>
+    </div>
+  	<div data-role="footer" data-position="fixed" style="background-color: #0188C8; color: #FFFFFF">
+      <h4>Grupo Principal © 2017</h4>
+    </div>
+    <div data-role="popup" id="update-account-popup" data-theme="a" class="ui-corner-all">
+      <form type="PUT" action="user" id="update-account-form">
+        <div style="padding:10px 20px;">
+          <h3>Actualizar Datos</h3>
+          <label class="ui-hidden-accessible">Usuario:</label>
+          <input type="text" name="username" value="" placeholder="usuario">
+          <label class="ui-hidden-accessible">Password:</label>
+          <input type="password" name="password" value="" placeholder="clave">
+          <button type="submit" class="ui-btn ui-corner-all ui-shadow">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

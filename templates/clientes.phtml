@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+</head>
+
+<body>
+ <div data-role="page" id="client-list-page" style="background-color: #DAE0EE">
+  	<div data-role="header" style="background-image: url(images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+      <a href="#seller-page" style="z-index:999;" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Volver</a>
+      <?php include("header_seller.phtml"); ?>
+    </div>
+    <div role="main" class="ui-content">
+      <ul data-filter="true" data-filter-placeholder="Buscar Cliente..." data-role="listview" data-inset="true"></ul>
+    </div>
+  	<div data-role="footer" data-position="fixed" style="background-color: #0188C8; color: #FFFFFF">
+      <h4>Grupo Principal © <?php echo date("Y"); ?></h4>
+    </div>
+  </div>
+<script>
+$(function(){
+    $.ajax({
+          url: server + "client",
+          type: "GET",
+          dataType: "json"
+        }).done(function(response){
+          var $list = $('#client-list-page').find("ul[data-role='listview']").empty();
+          $.each(response, function(i){
+            $list.append("<li class='capture-metadata' onclick=redirect('cheques/" + this.CLIEV_IDCLIENTE +"') data-icon='false' data-filtertext='" + this.CLIEV_NOMBRE + " " + this.CLIEV_RIF + " " + this.CLIEV_IDCLIENTE +"' data-id='" + this.CLIEV_IDCLIENTE + "' data-company='" + this.CLIEV_CODIEMPR + "' data-rif='" + this.CLIEV_RIF + "' data-name='" + this.CLIEV_RAZONSOC + "' data-vend='"+this.CRVV_IDVENDEDOR+"' data-prec='"+this.PLANV_TIPOPRECIO+"' data-tipo='"+this.CLIEV_IDTIPO+"'><a href='#new-request-page'><h2>" + this.CLIEV_IDCLIENTE + ": " + this.CLIEV_NOMBRE + "</h2><p>" + this.CLIEV_RIF + "</p></li>");
+          }); $list.listview("refresh");
+        });
+})    
+</script>
+</body>
+</html>

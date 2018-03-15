@@ -1,0 +1,112 @@
+<?php
+$link='';
+$ip='';
+$proy='1007';
+$host= $_SERVER["HTTP_HOST"];
+$url= $_SERVER["REQUEST_URI"];
+$link= "http://".$host.$url;
+if (!empty($_SERVER['HTTP_CLIENT_IP']))
+    $ip = $_SERVER['HTTP_CLIENT_IP'];
+elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
+    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+else
+    $ip = $_SERVER['REMOTE_ADDR'];
+if(!empty($_SESSION['user_gdp']))
+    $postData=array("proy"=>$proy,"host"=>$host,"url"=>$url,"link"=>$link,"ip"=>$ip,"user"=>$_SESSION['user_gdp']['user'],"login"=>$_SESSION['user_gdp']['login'],"tipo"=>$_SESSION['user_gdp']['tipo']);
+else
+    $postData=array("proy"=>$proy,"host"=>$host,"url"=>$url,"link"=>$link,"ip"=>$ip);
+
+try {
+    $handler = curl_init();
+    curl_setopt($handler, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($handler, CURLOPT_URL, "https://sistemasc.gdp.com.ve/laprincipal/dashboard/dasboard.php");  
+    curl_setopt($handler, CURLOPT_USERAGENT,"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.1) Gecko/2008070208 Firefox/3.0.1");  
+    curl_setopt($handler, CURLOPT_HTTPHEADER, array("Accept-Language: es-es,en"));
+    curl_setopt($handler, CURLOPT_POST,true); 
+    curl_setopt($handler, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($handler, CURLOPT_POSTFIELDS, $postData);
+    $response = curl_exec($handler);  
+    curl_close($handler);
+}catch(Exception $e) {
+    
+}
+?>
+<title>Grupo Principal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="<?php echo DOMAIN_ROOT ?>css/estilos.css" />
+    <link rel="stylesheet" href="<?php echo DOMAIN_ROOT ?>css/jquery.mobile-1.4.5.min.css" />
+    <link rel="stylesheet" href="<?php echo DOMAIN_ROOT ?>css/app.css" />
+    
+    <link rel="stylesheet" href="<?php echo DOMAIN_ROOT ?>css/bootstrap.css" />
+    
+    <link rel="stylesheet" href="<?php echo DOMAIN_ROOT ?>js/datatables/datatables.css" />
+   
+<link rel='stylesheet' href='<?php echo DOMAIN_ROOT ?>js/jAlert/jAlert.css'>
+
+    <script src="<?php echo DOMAIN_ROOT ?>js/jquery-2.1.4.min.js"></script>
+    <script src="<?php echo DOMAIN_ROOT ?>js/jquery.mobile-1.4.5.min.js"></script>
+    <script src="<?php echo DOMAIN_ROOT ?>js/simplecart.js"></script>
+    <script src="<?php echo DOMAIN_ROOT ?>js/cart-init.js"></script>
+    <script src="<?php echo DOMAIN_ROOT ?>js/core.js"></script>
+    <script src="<?php echo DOMAIN_ROOT ?>js/app.js"></script>
+    <script src="<?php echo DOMAIN_ROOT ?>js/bootstrap.js"></script>
+    <script src="<?php echo DOMAIN_ROOT ?>js/datatables/datatables.js"></script>
+    <script src="<?php echo DOMAIN_ROOT ?>js/bootstrap-datepicker.min.js"></script>
+    
+	<script src='<?php echo DOMAIN_ROOT ?>js/jAlert/jAlert.js'></script>
+	<script src='<?php echo DOMAIN_ROOT ?>js/jAlert/jAlert-functions.js'></script>
+    
+
+<!--<link rel="stylesheet" id="us-font-2-css" href="https://fonts.googleapis.com/css?family=Open+Sans%3A400%2C400italic%2C600&amp;subset=latin&amp;ver=4.8.1" type="text/css" media="all">
+<link rel="stylesheet" id="us-font-1-css" href="https://fonts.googleapis.com/css?family=Roboto%3A300%2C400%2C700&amp;subset=latin&amp;ver=4.8.1" type="text/css" media="all">
+-->
+
+
+<link rel="shortcut icon" href="<?php echo DOMAIN_ROOT ?>images/gdp_icon.png" />
+<script>
+$(function(){
+ $.ajax({
+          url: "<?php echo DOMAIN_ROOT ?>menu",
+          type: "GET",
+          dataType: "json",
+        }).done(function(response){ 
+          console.log(response);
+            $('.menu-dinamic').append(response.content);
+       });
+
+})
+function redirect(url){
+    window.location.assign(url);
+}
+ function redirect(url){
+    if(url=='pedidos'){
+        var fecha = new Date();
+        var diasemana=fecha.getDay();
+        var dias = new Array(7);
+        dias[0]="Domingo";
+        dias[1]="Lunes";
+        dias[2]="Martes";
+        dias[3]="Miércoles";
+        dias[4]="Jueves";
+        dias[5]="Viernes";
+        dias[6]="Sábado";
+        $.ajax({
+          url: server + "limites",
+          type: "GET",
+          dataType: "json"
+        }).done(function(response){
+            console.log(response);
+           //alert(diasemana+"--__--"+response[0].DIAVISI);
+          if(response[0].DIAVISI != diasemana){
+               alert("Su dia de visita es el "+dias[response[0].DIAVISI]+" solo puede realizar pedidos ese dia.");
+           }else{
+               window.location.assign("<?php echo DOMAIN_ROOT ?>"+url);
+           }
+        });
+        
+    }else{
+        window.location.assign("<?php echo DOMAIN_ROOT ?>"+url);
+    }
+    
+}
+</script>

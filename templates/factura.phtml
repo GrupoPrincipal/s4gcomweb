@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  
+</head>
+
+<body>
+
+    <!--Pagina de inicio-->
+  <div data-role="page" id="detail" >
+      <?php $dist=$data["distribuidor"]; $clie=$data["cliente"];  ?>
+  	<div data-role="header">
+        <h2 style="color: #3849b1">Factura</h2>
+      </div>
+      <!-- ## Contenedor principal ## -->
+    <div role="main" class="ui-content row">
+            
+            <div class="cold-md-12">
+            <div class="col-md-12" align="right"><a title="Imprimir" class="glyphicon glyphicon-print" onclick="imprimir()"></a></div>
+                <table>
+                    <thead>
+                        <tr>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <td><img src="<?php echo DOMAIN_ROOT ?>images/gdp_icon.png" ></td>
+                                        <td style="color: #3849b1;width:870px"><h3><?php echo $dist['NOMBALMA']; ?></h3> 
+                                            <span style="top: -15px;position: relative;font-size: 11px;display: block;text-align: center;">RIF.: <?php echo $dist['RIF']; ?></span></td>                                        
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table>
+                                <tr><td><label style="font-size: 14px"><?php echo $dist['DIRECCION1']." ".$dist["DIRECCION2"]; ?></label></td></tr><tr><td>Telefonos:<?php echo $dist['TELEFONO1']; ?></td></tr>
+                                    <tr>
+                                        <td>
+                                            <table>
+                                                <tr>                                                                                                  
+                                                    <td>Razon social:<label style="font-size: 10px"> <?php echo $clie['RAZOSOCI']; ?></label></td>
+                                                    <td>Nom Cliente:<label style="font-size: 10px"> <?php echo $clie['NOMBCLIE']; ?></label></td>
+                                                    <td>Direccion:<label style="font-size: 10px"><?php echo $clie['DIRECCION1']; ?></label></td>
+                                                    <td>Dir. Entrega: <label style="font-size: 10px"><?php echo $clie['DIRECCION1']; ?></label> </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td>
+                                            <table>
+                                                <tr>
+                                                    <td>Ciudad:<label style="font-size: 10px"> <?php echo $clie['nombciud']; ?></label> Estado:<label style="font-size: 10px"> <?php echo $clie['nombesta']; ?></label></td>
+                                                    <td>Zona Postal:<label style="font-size: 10px"> <?php echo $clie['CODIPOST']; ?></label></td>
+                                                    <td>Cod Cliente:<label style="font-size: 10px"> <?php echo $clie['CODICLIE']; ?></label></td>
+                                                    <td>Rif:<label style="font-size: 10px"> <?php echo $clie['RIF']; ?></label></td>                                                  
+                                                    <td>No Pedido:<label style="font-size: 10px"> <?php echo $data[0]['pedido']; ?></label></td>
+                                                   
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            
+                        </tr>
+                        <tr>
+                            <td> <?php //echo count($data); ?></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <br>
+                                <table style="width:100%;    font-size: 10px;">
+                                    <tr style="border-bottom: solid;border-width: 1px;">
+                                       <td>N°</td> <td>CODIGO</td><td>CANT.</td><td>UNIDAD</td><td>COD.</td><td>DESCRIPCION</td><td style="text-align: right">P. UNITARIO</td><td style="text-align: right">DSCTO1 %</td><td style="text-align: right">DSCTO2 %</td><td style="text-align: right">SUB-TOTAL</td><td style="text-align: right">IVA</td><td>&nbsp;</td>
+                                    </tr>
+                                    <?php
+                                    $i=1;
+                                        foreach($data as $fac){
+
+                                         if($fac['precvent']!=0){ $cal= ($fac['precvent']/$fac['unidcaja']) * $fac['unidades']; $cal1=$cal+$cal1;   $unid=$fac['precvent']/$fac['unidcaja'];  
+                                         if($fac['cajas']!=0)  $peso=($fac['unidcaja']*$fac['unidades'])*$fac['miliunid'];
+                                            else  $peso=$fac['unidades']*$fac['miliunid'];  $tpeso=$peso+$tpeso; 
+                                    ?>
+                                    <tr>
+                                        <td><?php echo $i; ?></td>
+                                        <td><?php echo $fac['codiprod']; ?></td><td><?php echo $fac['cajas']; $caja=$fac['cajas']+$caja; ?></td>
+                                        <td><?php if($fac['cajas']!=0) echo $fac['descunid']; else echo $fac['unidades']; ?><td></td><td><?php echo $fac['descprod']; ?></td><td style="text-align: right"><?php if($fac["cajas"]==0 ) echo number_format($unid,2); else  echo number_format($fac['precvent'],2); ?></td>
+                                        <td></td><td></td><td style="text-align: right"><?php if($fac['precvent']!=0){ echo number_format($cal,2); 
+                                          $tsub=$cal+$tsub; if($fac['impu1']) $tiva=$cal*0.12+$tiva; if($fac['impu1']) $base=$cal+$base; if($fac['impu1']==0) $exen=$cal+$exen;}  
+                                         ?></td>
+                                        <td style="text-align: right"><?php if($fac['impu1']!=0) echo number_format($fac['impu1'],1); else echo "Ex.n"; ?></td><td></td>
+                                    </tr>
+                                    <?php
+                                        }
+                                            $i++;
+                                    }
+                                    ?>
+                                </table>
+                                <br>
+                                <table style="font-size: 11px">
+                                    <tr>                                       
+                                         <td>Cajas:&nbsp;<?php echo $caja;?>&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;Base Imponible1 12%:&nbsp;<?php echo number_format($base,2); ?></td><td>&nbsp;&nbsp;&nbsp;</td><td>I.V.A 12%:&nbsp;</td><td><?php echo number_format($tiva,2); ?></td> <td>&nbsp;&nbsp;&nbsp;Monto Exento:</td><td>&nbsp;<?php echo number_format($exen,2); ?></td>
+                                           
+                                    </tr>
+                                    <tr>
+                                         <td>Kilos:&nbsp;<?php echo number_format($tpeso,2); ?></td>
+                                          <td>&nbsp;&nbsp;Subtotal:&nbsp;<?php echo number_format($tsub,2); ?></td>
+                                    </tr>
+                                    <tr>
+                                       
+                                       
+                                        <td style="font-size: 12px">Total a Pagar:&nbsp;<?php  echo "<strong>".number_format($tsub+$tiva,2)."</strong>";?></td>    
+                                    </tr>
+                                </table>
+                            </td>
+                            
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+    </div>
+       <script>
+        function imprimir() {
+            window.print();
+        }
+    </script>
+    <br><p align="center">COPIA SIN DERECHO A CREDITO FISCAL</p>
+      <!-- ## FIN contenedor principal ## -->
+  	<div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF;">
+      <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+    </div>
+  </div>
+<script>
+
+</script>
+</body>
+</html>

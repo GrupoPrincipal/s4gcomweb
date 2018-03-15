@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+    <link rel="stylesheet" href="<?php echo DOMAIN_ROOT ?>js/daterangepicker/daterangepicker.css" />
+    <script src="<?php echo DOMAIN_ROOT ?>js/daterangepicker/moment.js"></script>  
+    <script src="<?php echo DOMAIN_ROOT ?>js/daterangepicker/daterangepicker.js"></script>
+</head>
+
+<body>
+  <div data-role="page" id="admin-ini-page" >
+  	<div data-role="header" style="background-image: url(<?php echo DOMAIN_ROOT ?>images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+        <?php include("header_lider.phtml"); ?>
+        <div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right">
+            <a href="#" data-rel="back"  style="z-index:999;" class="bto_volver ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Volver</a>
+        </div>
+    </div>
+      <!-- ## Contenedor principal ## -->
+    <div role="main" class="ui-content">
+<br><br>
+<div class="row">
+  
+    <div class="col-md-10 col-md-offset-1" id="listado">
+        <label>Rango de fechas: </label>
+        <label>Pedido: <b class='item-ped'></b></label>
+        <label>Facturado: <b class='item-fac'></b></label>
+        <?php
+        $fecha = date('Y-m-j');
+        $nuevafecha = strtotime ( '-7 day' , strtotime ( $fecha ) ) ;
+        $nuevafecha = date ( 'Y/m/j' , $nuevafecha );
+        ?>
+        <input type="text" id="daterange" name="daterange" onchange="cargarped(this);" value="<?php echo $nuevafecha." - ".date("Y/m/d") ?> "/>
+       <div role="main" class="ui-content">
+      <div data-role="collapsibleset" class="list-facturas" >
+           <ul data-role="listview"  data-inset="true" class="listview">
+                <li><table  class="lista-table"><tr>
+                        <th style="width: 3%;text-align: center;">Ped N°</th>
+                        <th style="width: 8%;text-align: center;">Fecha</th>
+                        <th style="width: 59%;text-align: center;">Cliente</th>
+                        <th style="width: 10%;text-align: center;">Pedido</th>
+                        <th style="width: 12%;text-align: center;">Total</th>
+                        <th style="width: 8%;text-align: center;">Documentos</th>
+                    </tr></table></li>
+               <?php
+    $i=1;
+                foreach($data as $l){
+                    $ruta= $l['CODIRUTA'];
+               ?>
+                    <li class="ui-first-child ui-last-child listar">
+                        <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" href="./detalle/<?php echo $l['NUMEPEDI']; ?>">
+                            <table class="lista-table">
+                                <tr>
+                                    <td style="width: 3%;text-align: center;"><?php echo $i; ?></td>
+                                    <td style="width: 8%;text-align: center;"><?php echo $l['FECHA'] ?></td>
+                                    <td style="width: 60%;text-align: center;"><?php echo $l['NOMBCLIE'] ?></td>
+                                    <td style="width: 10%;text-align: center;"><?php echo $l['NUMEPEDI'] ?></td>
+                                    <td style="width: 12%;text-align: right;"><?php echo number_format($l['TOTAPEDI'], 2, ',', '.') ?></td>
+                                    <td style="width: 8%;text-align: center;"><center><?php echo $l['FAC'] ?></center></td>
+                                </tr>
+                            </table>
+                        </a>
+                    </li>
+               <?php
+                   $i++;
+                }
+               ?> 
+          </ul>
+      </div>
+    </div>
+    </div>
+   
+</div>
+
+<script>
+ $(function(){
+     var start = moment();
+    $('#daterange').daterangepicker({
+            locale: {
+                applyLabel:"Aceptar",
+                cancelLabel: "Cancelar",
+                customRangeLabel: "Otro rango",
+                format: 'YYYY/MM/DD'
+            },
+            maxDate: start,
+            ranges: {
+               'Hoy': [moment(), moment()],
+               '7 dias': [moment().subtract(6, 'days'),moment()],
+               '30 dias': [moment(), moment().subtract(-29, 'days')],
+               'Por este mes': [moment().startOf('month'), moment()],
+            }
+
+        });
+ })
+function cargar(){
+    $('#datatable').DataTable();
+}
+function cargarped(e){
+    var pag = $('.list-facturas'); 
+    var fecha = $(e).val();
+    var ruta = '<?php echo $ruta; ?>';
+    $.ajax({
+        url: "./facturas",
+        type: "post",
+        data: "fecha="+fecha+"&ruta="+ruta,
+        dataType: "json"
+    }).done(function(response){
+        var element = "";
+        $('.listar').remove();
+        var facturas=0;
+        var count=0;
+        var j=1;
+        $.each(response, function(i){
+            facturas =this.FAC+facturas; 
+            count =count+1;
+            element = '<li class="ui-first-child ui-last-child listar"><a class="ui-btn ui-btn-icon-right ui-icon-carat-r" href="./detalle/'+this.NUMEPEDI+'"><table class="lista-table"><tr><td style="width: 4%;text-align: center;">'+j+'</td><td style="width: 8%;text-align: center;">'+this.FECHA+'</td><td style="width: 59%;text-align: center;">'+this.NOMBCLIE+'</td><td style="width: 10%;text-align: center;">'+this.NUMEPEDI+'</td><td style="width: 12%;text-align: right;">'+this.TOTAPEDI+'</td><td style="width: 8%;text-align: center;">'+this.FAC+'</td></tr></table></a></li>';
+            pag.children(".listview").append(element);
+            j=j+1;
+        });
+       // facturas=facturas-1;
+        $('.item-ped').html(count);
+        $('.item-fac').html(facturas);
+       // $('.list-fecturas').text(response);
+    });
+}
+
+</script>
+
+  </div>
+      <!-- ## FIN contenedor principal ## -->
+      
+  	<div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF;">
+      <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+    </div>
+  </div>
+</body>
+</html>

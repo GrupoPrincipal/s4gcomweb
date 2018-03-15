@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+</head>
+
+<body>
+  <div data-role="page" id="admin-main-page" style="background-color: #DAE0EE">
+  	      <?php include("header_dinamic.phtml"); ?>
+    </div>
+    <div role="main" class="ui-content">
+    <?php  
+        if($_SESSION["user"]['DEPARTAMENTO']=='GDP Tecnologia' || $_SESSION["user"]["CUENV_USUARIO"] == 'admin'){
+    ?>
+      <ul data-role="listview" data-inset="true">
+        <li><a href="#new-account-page">Crear nueva cuenta</a></li>
+        <li><a href="#update-account-page">Actualizar / Eliminar Cuentas</a></li>
+      </ul>
+       <div class="col-md-10 col-md-offset-1"  id="listado">
+           <div role="main" class="ui-content">
+              <div data-role="collapsibleset" class="list-fecturas" >
+                   <ul data-role="listview"  data-inset="true" class="listview">
+                        <li><table  class="lista-table"><tr><th style="width:20%;">Ruta</th><th style="width:40%;">Asesor</th><th style="width:40%;">Telefono</th></tr></table></li>
+                       <?php foreach($_SESSION["user"]['rutas'] as $d){ ?>
+                            <li>
+                                <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" onclick="cargarpedido('<?php echo $d['CODIRUTA']; ?>')" href="#">
+                                    <table  class="lista-table"><tr><th style="width:20%;text-align:center;"><?php echo $d['CODIRUTA']; ?></th><th style="width:40%;text-align:center;"><?php echo $d['NOMBVEND']; ?></th><th style="width:40%;text-align:center;"><?php echo $d['TELEVEND']; ?></th></tr></table>
+                                </a>
+                            </li>
+                       <?php } ?>
+                   </ul>
+              </div>
+            </div>
+        </div>
+        <script>
+        function cargarpedido(ruta){
+            console.log(ruta);
+            $.post('<?php echo DOMAIN_ROOT ?>../dologin.php?ruta='+ruta,'ruta='+ruta,function(response){
+               window.location.assign('<?php echo DOMAIN_ROOT ?>cargar');
+            });
+        }
+        </script>
+        <?php
+            }
+        ?>
+    </div>
+  	<div data-role="footer" data-position="fixed" style="background-color: #0188C8; color: #FFFFFF">
+       <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+    </div>
+
+  <div data-role="page" id="new-account-page" style="background-color: #00639E">
+  	<div data-role="header" style="background-image: url(images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+        <?php  include("headeradm.phtml"); ?>
+        <a href="./" data-rel="back" style="z-index:999;" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Volver</a>
+    </div>
+    <div role="main" class="ui-content">
+      <form type="POST" action="account" id="new-account-form">
+        <ul data-role="listview" data-inset="true">
+          <li class="ui-field-contain"  style="background-color: #DAE0EE">
+            <label>Usuario:</label>
+            <input type="text" name="username" value="" data-clear-btn="true">
+          </li>
+          <li class="ui-field-contain" style="background-color: #DAE0EE">
+            <label>Password:</label>
+            <input type="password" name="password" value="" data-clear-btn="true">
+          </li>
+          <li class="ui-field-contain ui-option-a"  style="background-color: #DAE0EE">
+            <label>Empresa:</label>
+            <select name="company"></select>
+          </li>
+          <li class="ui-field-contain"  style="background-color: #DAE0EE">
+            <label>Tipo de Usuario:</label>
+            <select name="type">
+              <option value="1">Vendedor</option>
+              <option value="2">Cliente</option>
+            </select>
+          </li>
+          <li class="ui-field-contain ui-option-b"  style="background-color: #DAE0EE">
+            <label>Cliente:</label>
+            <input name="client" id="new-account-client-autocomplete" data-type="search" placeholder="Buscar cliente...">
+            <ul data-role="listview" data-filter="true" data-filter-reveal="true" data-input="#new-account-client-autocomplete"></ul>
+          </li>
+          <li class="ui-field-contain ui-option-a"  style="background-color: #DAE0EE">
+            <label>Vendedor:</label>
+            <select name="seller"></select>
+          </li>
+          <li class="ui-field-contain" style="background-color: #DAE0EE">
+            <button type="submit" class="ui-btn ui-corner-all ui-btn-a">Aceptar</button>
+          </li>
+        </ul>
+      </form>
+    </div>
+  	<div data-role="footer" data-position="fixed" style="background-color: #0188C8; color: #FFFFFF">
+       <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+    </div>
+  </div>
+
+  <div data-role="page" id="update-account-page" style="background-color: #DAE0EE">
+  	<div data-role="header" style="background-image: url(images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+       <?php  include("headeradm.phtml"); ?>
+        <a href="#" data-rel="back" style="z-index:999;" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Volver</a>
+    </div>
+    <div role="main" class="ui-content">
+      <ul data-role="listview" data-inset="true"></ul>
+    </div>
+  	<div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF">
+       <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+    </div>
+    <div data-role="popup" id="update-account-popup" data-theme="a" class="ui-corner-all">
+      <form type="PUT" action="user" id="update-account-form">
+        <div style="padding:10px 20px;">
+          <h3>Actualizar Datos</h3>
+          <label class="ui-hidden-accessible">Usuario:</label>
+          <input type="text" name="username" value="" placeholder="usuario">
+          <label class="ui-hidden-accessible">Password:</label>
+          <input type="password" name="password" value="" placeholder="clave">
+          <button type="submit" class="ui-btn ui-corner-all ui-shadow">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+    
+    <div data-role="page" id="client-list-page" style="background-color: #DAE0EE">
+            <div data-role="header" style="background-image: url(images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+              <a href="#seller-page" style="z-index:999;" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Volver</a>
+              <?php include("header_seller.phtml"); ?>
+            </div>
+            <div role="main" class="ui-content">
+              <ul data-filter="true" data-filter-placeholder="Buscar Cliente..." data-role="listview" data-inset="true"></ul>
+            </div>
+            <div data-role="footer" data-position="fixed" style="background-color: #0188C8; color: #FFFFFF">
+              <h4>Grupo Principal © <?php echo date("Y"); ?></h4>
+            </div>
+    </div>
+    
+</body>
+</html>

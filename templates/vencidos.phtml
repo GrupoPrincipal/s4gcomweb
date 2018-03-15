@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+
+<body>
+
+    <!--Pagina de inicio-->
+
+  <div data-role="page" id="vencidos" >
+  	<div data-role="header">
+        <h2 style="color: #3849b1">Documentos vencidos</h2>
+      </div>
+      <!-- ## Contenedor principal ## -->
+    <div role="main" class="ui-content row">
+        <div class="col-md-12">
+            <?php
+            if(!empty($data)){
+            ?>
+            <table id="datatable"   class="table table-hover table-condensed">
+                <thead>
+                    <tr>
+                        <th>Documento</th><th>Fecha de Entrega</th><th>Fecha de Vencimiento</th><th>Monto total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach($data as $d){ ?>
+                    <tr>
+                        <td> <?php echo $d['NUMEDOCU']; ?> </td><td> <?php echo $d['FENTREGA']; ?> </td><td> <?php echo $d['FVENCMTO']; ?> </td><td> <?php echo $d['MONTO']; ?> </td>
+                    </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+            <?php
+            }else{
+            ?>
+                <br><br><br><br><br><br><br>
+                <div class="alert alert-info" align="center"><strong>NO TIENE DOCUMENTOS VENCIDOS</strong> </div>
+            <?php
+            }
+            ?>
+             
+        </div>
+    <br>
+  </div>
+  </div>
+</body>
+</html>

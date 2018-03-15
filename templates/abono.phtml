@@ -1,0 +1,98 @@
+﻿<?php 
+
+$montot= array();
+$monto = array();
+$i=0;
+$j=0;
+foreach ($data['factmon'] as $val) {
+  $monto[$i]=$val['MONTO'];
+  $i++;
+}
+foreach ($data['factura'] as $valo) {
+  $montot[$j]=$valo['monto'];
+  $j++;
+}
+
+
+?>
+
+
+<div data-role="page" id="detail" >    
+    <div data-role="header">
+     <a href="#" onclick="redirect('/facturaxpagar')" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-left">Close</a>
+        <h2 style="color: #3849b1">Abono Factura <?php echo $fact=$data['factura']; $montot=$data['monto']; ?></h2>
+    </div>
+      <!-- ## Contenedor principal ## -->
+    <div role="main" class="ui-content row">
+    <div class="row">
+    <div class="col-md-10 col-md-offset-1">    
+       <div role="main" class="ui-content">
+            <div data-role="collapsibleset">
+
+                <form type="POST" action="createAbono" id="varios" enctype="multipart/form-data">               
+                 <div class="form-group">
+                      <div class="col-md-10"><strong>Total a pagar pendiente:</strong> <?php $tp=$montot-array_sum($monto); echo number_format($tp,2); ?></div>
+                      <input type="hidden" name="tp" id="tp" value="<?php echo $tp; ?>">
+                      <div class="col-md-12"><strong>Monto:</strong>
+                          <input type="hidden" name="nume" id="nume"  value="<?php echo $fact; ?>">     
+                          <input type="text" name="monto"  id="monto">
+                          <div class="errores alert alert-danger" id="mensaje1">
+                            <strong>Ingrese el monto</strong>
+                          </div>
+                          <div class="errores alert alert-danger" id="mensaje6">
+                            <strong>El monto es mayor a lo pendiente</strong>
+                          </div>
+                          <div class="errores alert alert-danger" id="mensaje7">
+                            <strong>Ingrese un monto valido</strong>
+                          </div>
+                      </div>
+                   
+                      <div class="col-md-12"><strong>N° Referencia:</strong>          
+                          <input type="text" name="descri" id="descri" value="" >
+                          <div class="errores alert alert-danger" id="mensaje2">
+                            <strong>Ingrese el numero de recibo</strong>
+                          </div>
+                      </div> 
+                      <div class="col-md-6"><strong>Bancos:</strong>
+                        <select name="banco" id="banco" class="form-control">
+                          <option value="0" >Seleccione</option>
+                          <?php foreach ($data['banco'] as $d) { 
+                            if($d['CODIBANC']!=0){?>
+                             <option value="<?php echo $d['CODIBANC']; ?>"><?php echo $d['NOMBBANC']; ?></option>
+                           <?php } } ?>  
+                        </select>    
+                          <div class="errores alert alert-danger" id="mensaje4">
+                            <strong>Seleccione un Banco</strong>
+                          </div>
+                        </div>
+                        <div class="col-md-6"><strong>Modo de pago:</strong>
+                          <select name="tpago" id="tpago" class="form-control">
+                            <option value="0">Seleccione</option>
+                            <option value="1">Transferencia</option>
+                            <option value="2">Cheque</option>
+                            <option value="3">Deposito</option>                                         
+                          </select>
+                            <div class="errores alert alert-danger" id="mensaje5">
+                            <strong>Seleccione un Modo de pago</strong>
+                          </div>
+                        </div>
+                      <div class="col-md-12"><strong>Captura de Pantalla:</strong>
+                      
+                        
+                        <input type="file" id="imagen" name="imagen" class="btn btn-default" />     
+                   
+                      </div>
+                      <div class="control-label col-md-2">
+                        <button type="button"  onclick="abonarfact()" class="btn btn-default"><strong>Registrar</strong></button>
+                     
+                      </div>
+                       <div class="errores alert alert-info" id="mensaje3">
+                         <strong>El abono fue registrado, tiene un lapso de 24 a 48 horas para ser procesado</strong>
+                        </div>
+                  </form>
+                </div>
+              
+              </div>
+             </div>          
+            </div>  
+            

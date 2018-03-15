@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+    <link rel="stylesheet" href="<?php echo DOMAIN_ROOT ?>js/daterangepicker/daterangepicker.css" />
+    <script src="<?php echo DOMAIN_ROOT ?>js/daterangepicker/moment.js"></script>  
+    <script src="<?php echo DOMAIN_ROOT ?>js/daterangepicker/daterangepicker.js"></script>
+</head>
+
+<body>
+  <div data-role="page" id="admin-ini-page" >
+  	<div data-role="header" style="background-image: url(images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+        <?php include("header_lider.phtml"); ?>
+    </div>
+      <!-- ## Contenedor principal ## -->
+    <div role="main" class="ui-content">
+<br><br>
+<div class="row">
+
+    <div class="col-md-10 col-md-offset-1"  id="listado">
+       <div role="main" class="ui-content">
+      <div data-role="collapsibleset" class="list-fecturas" >
+           <ul data-role="listview"  data-inset="true" class="listview">
+                <li><table  class="lista-table"><tr><th style="width:20%;">Ruta</th><th style="width:40%;">Asesor</th><th style="width:40%;">Telefono</th></tr></table></li>
+               <?php foreach($data as $d){ ?>
+                    <li>
+                        <a class="ui-btn ui-btn-icon-right ui-icon-carat-r" onclick="redirect('./pedidos/<?php echo $d['CODIRUTA']; ?>')" href="#">
+                            <table  class="lista-table"><tr><th style="width:20%;text-align:center;"><?php echo $d['CODIRUTA']; ?></th><th style="width:40%;text-align:center;"><?php echo $d['NOMBVEND']; ?></th><th style="width:40%;text-align:center;"><?php echo $d['TELEVEND']; ?></th></tr></table>
+                        </a>
+                    </li>
+               <?php } ?>
+           </ul>
+      </div>
+    </div>
+    </div>
+</div>
+
+<script>
+
+
+</script>
+
+  </div>
+      <!-- ## FIN contenedor principal ## -->
+      
+  	<div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF;">
+      <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+    </div>
+  </div>
+</body>
+</html>

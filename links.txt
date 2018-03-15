@@ -1,0 +1,2 @@
+https://www.teusink.eu/2014/07/cards-user-interface-in-jquery-mobile.html
+https://gist.github.com/teusink/3597bb0655c95b5a374e

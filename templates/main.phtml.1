@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>S4GCOMWEB</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css" />
+  <link rel="stylesheet" href="css/app.css" />  
+  <script src="js/jquery-2.1.4.min.js"></script>
+  <script src="js/jquery.mobile-1.4.5.min.js"></script>
+  <script src="js/simplecart.js"></script>
+  <script src="js/cart-init.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/app.js"></script>  
+  <script>
+    $(function(){
+      simpleCart.empty();
+      _pageType = "client";
+      $.ajax({
+          url: server + "client/x",
+          type: "GET",
+          dataType: "json"
+      }).done(function(response){ 
+        _tmp.clientID = response.CLIEV_IDCLIENTE;
+        _tmp.clientEmpr = response.CLIEV_CODIEMPR;
+        _tmp.sellerID = response.PLANV_IDVENDEDOR;
+        _tmp.tipoPRE = response.PLANV_TIPOPRECIO;
+        _tmp.tipoCLIE = response.CLIEV_IDTIPO;
+        _tmp.pagREG = 20;
+        _tmp.pagNUM = 1;  
+        _tmp.pagTOT = 0;  
+        _tmp.pagLOT = 0;
+        _tmp.numePED = 0;    
+        _tmp.pediEDT = false;    
+         $.ajax({
+          url: server + "product/" + _pageType,
+          type: "GET",
+          dataType: "json",
+          data: {
+            "tipoprec" : _tmp.tipoPRE,
+            "idcliente" : _tmp.clientID,
+            "idtipo" : _tmp.tipoCLIE,
+            "company" : _tmp.clientEmpr,
+          },
+        }).done(function(response){   
+          if(response.message != undefined)
+            alert("Mensaje: "+response.message);
+          $("a.bto_primera").addClass("ui-state-disabled");
+          $("a.bto_anterior").addClass("ui-state-disabled");
+          _tmp.pagTOT = Math.ceil(response.id/_tmp.pagREG);
+          if(_tmp.pagTOT <= 1){
+            $("a.bto_siguiente").addClass("ui-state-disabled");
+            $("a.bto_final").addClass("ui-state-disabled");
+          }                
+          loadProductList(_pageType);     
+        });
+      });              
+    })</script>
+    <style>  
+      h5 {
+        font-size: 12px;
+      }    
+      @media only screen and (max-width: 1200px) {
+          h5{
+              font-size: 11px;
+          }
+      }
+      @media only screen and (max-width: 1000px) {
+          h5{
+              font-size: 10px;
+          }
+      }
+      @media only screen and (max-width: 900px) {
+          h5{
+              font-size: 9px;
+          }
+      }
+      @media only screen and (max-width: 800px) {
+          h5{
+              font-size: 8px;
+          }
+      }
+    </style>
+</head>
+
+<body>
+  <div data-role="page" id="client-main-page" style="background-color: #DAE0EE">
+  	<div data-role="header" data-position="fixed" style="background-color: #004372; color: #DAE0EE">
+      <a href="#!" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-power logout-action">Salir</a>
+      <h1>Toma de Articulos</h1>
+      <div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right">
+        <a href="#client-orders-page" class="ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-bars">Mis Pedidos</a>
+        <a href="#cart-panel" class="ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-action">Totalizar</a>
+      </div>
+      <div data-role="navbar" class="group-control">
+        <div class="ui-grid-a ui-responsive">
+          <div class="ui-grid-c ui-block-a ui-responsive" style="font-size:14px;" >
+            <div class="ui-block-a"><span>Cantidad: </span><span class="simpleCart_quantity1"></span> </div>
+            <div class="ui-block-c"><span>Desc.: </span><span class="simpleCart_desc"></span></div>
+            <div class="ui-block-b"><span>Sub-Total: </span><span class="simpleCart_grandTotal"></span></div>            
+            <div class="ui-block-c"><span>I.V.A.: </span><span class="simpleCart_iva"></span></div>
+            <div class="ui-block-d"><span>Total: </span><span class="simpleCart_finalTotal"></span></div>
+          </div>
+          <div class="ui-block-b ui-responsive">
+          </div>
+        </div>
+        <ul>
+          <li><select id="group-aa"><option value="all">TODOS</option></select></li>
+          <li><select id="group-ab"><option value="all">TODOS</option></select></li>
+          <li><select id="group-ac"><option value="all">TODOS</option></select></li>
+        </ul>
+        <div class="ui-grid-solo">
+          <div class="ui-block-a"><input id="searchField" type="text" placeholder="Buscar producto..." /></div>
+        </div>
+        <div class="ui-grid-solo" style="font-size:14px;">          
+          <a class="bto_primera" href="#">Primera</a>
+          <a class="bto_anterior" href="#">Anterior</a>
+          <a class="bto_siguiente" href="#">Siguiente</a>
+          <a class="bto_final" href="#">Final</a>
+          <span class="simpleCart_paginas"></span>
+        </div> 
+      </div>
+    </div>
+    <div role="main" class="ui-content">
+      <div class="ui-grid-c ui-responsive">
+        <div class="ui-block-a ui-responsive" id="CardsBlockA"></div>
+        <div class="ui-block-b ui-responsive" id="CardsBlockB"></div>
+        <div class="ui-block-c ui-responsive" id="CardsBlockC"></div>
+        <div class="ui-block-d ui-responsive" id="CardsBlockD"></div>
+      </div>
+    </div>
+  	<div data-role="footer" data-position="fixed" style="background-color: #0188C8; color: #FFFFFF">      
+      <h4>s4GcomWeb © Seu4 Plus 2017</h4>
+    </div>
+    
+    <div data-role="panel" data-position="right" data-display="overlay" id="cart-panel">
+      <div class="ui-grid-solo">
+        <div class="ui-block-a">
+          <a href="#checkout-page" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-action">Procesar</a>
+        </div>
+      </div>
+      <div class="ui-grid-solo">
+        <div class="ui-block-a cart-items"></div>
+      </div>
+      <div class="ui-grid-solo">
+        <table class="simpleCart_totals" align="right" style="font-size:12px;">
+          <tr>
+            <th >Cantidad:</th>
+            <td><span class="simpleCart_quantity1"></span></td>
+          </tr>
+          <tr>
+            <th >Descuentos:</th>
+            <td><span class="simpleCart_desc"></span></td>
+          </tr>
+          <tr>
+            <th>Sub-Total:</th>
+            <td><span class="simpleCart_grandTotal"></span></td>
+          </tr>
+          <tr>
+            <th>I.V.A.:</th>
+            <td><span class="simpleCart_iva"></span></td>
+          </tr>
+          <tr>
+            <th>Total:</th>
+            <td><span class="simpleCart_finalTotal"></span></td>
+          </tr>
+        </table>
+      </div>      
+    </div>
+  </div>
+
+  <div data-role="page" id="checkout-page">
+  	<div data-role="header" data-position="fixed" style="background-color: #004372; color: #DAE0EE">
+      <a href="#" data-rel="back" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Volver</a>
+      <h1>Detalles del Pedido</h1>
+      <a href="#" data-rel="back" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-check ui-btn-checkout">Procesar</a>
+    </div>
+    <div role="main" class="ui-content">
+      <div class="cart-items"></div>
+      <table class="simpleCart_totals" align="right" style="font-size:12px;">
+        <tr>
+          <th >Cantidad:</th>
+          <td><span class="simpleCart_quantity1"></span></td>
+        </tr>        
+        <tr>
+          <th >Descuentos:</th>
+          <td><span class="simpleCart_desc"></span></td>
+        </tr>
+        <tr>
+          <th>Sub-Total:</th>
+          <td><span class="simpleCart_grandTotal"></span></td>
+        </tr>
+        <tr>
+          <th>I.V.A.:</th>
+          <td><span class="simpleCart_iva"></span></td>
+        </tr>
+        <tr>
+          <th>Total:</th>
+          <td><span class="simpleCart_finalTotal"></span></td>
+        </tr>
+      </table>
+    </div>
+  	<div data-role="footer" data-position="fixed" style="background-color: #0188C8; color: #FFFFFF">
+      <h4>s4GcomWeb © Seu4 Plus 2017</h4>
+    </div>
+  </div>
+
+  <div data-role="page" id="client-orders-page" style="background-color: #DAE0EE">
+  	<div data-role="header" data-position="fixed" style="background-color: #004372; color: #DAE0EE">
+      <a href="#" data-rel="back" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Volver</a>
+      <h1>Listado de mis Pedidos</h1>
+    </div>
+    <div role="main" class="ui-content">
+      <div data-role="collapsibleset">
+        <div data-role="collapsible" data-collapsed-icon="user" data-expanded-icon="user">
+          <h2>Pedidos Pendientes por procesar</h2>
+          <ul data-type="PENDIENTE" data-role="listview" data-inset="true" data-split-icon="delete"></ul>
+        </div>        
+        <div data-role="collapsible" data-collapsed-icon="delete" data-expanded-icon="delete">
+          <h2>Pedidos Rechazados por la empresa</h2>
+          <ul data-type="RECHAZADO" data-role="listview" data-inset="true"></ul>
+        </div>
+        <div data-role="collapsible" data-collapsed-icon="arrow-u" data-expanded-icon="arrow-u">
+          <h2>Pedidos Enviados a la empresa</h2>
+          <ul data-type="DESCARGADO" data-role="listview" data-inset="true"></ul>
+        </div>
+        <div data-role="collapsible" data-collapsed-icon="check" data-expanded-icon="check">
+          <h2>Pedidos Procesados por la empresa</h2>
+          <ul data-type="PROCESADO" data-role="listview" data-inset="true"></ul>
+        </div>
+      </div>
+    </div>
+  	<div data-role="footer" data-position="fixed" style="background-color: #0188C8; color: #FFFFFF">
+      <h4>s4GcomWeb © Seu4 Plus 2017</h4>
+    </div>
+  </div>
+
+  <div data-role="page" id="order-details-page">
+  	<div data-role="header" data-position="fixed" style="background-color: #004372; color: #DAE0EE">
+      <a href="#" data-rel="back" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Volver</a>
+      <a href="#client-main-page" class="btoEditar ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-edit">Editar</a>
+      <h1>Detalles <span class="order-title"></span> <span class="order-id"></span></h1>
+    </div>
+    <div role="main" class="ui-content">
+      <p>Número: <span class="order-id"></span></p>
+      <p>Fecha: <span class="order-date"></span></p>
+      <p>Cliente: <span class="order-client-name"></span></p>
+      <p>Ruta: <span class="order-seller-name"></span></p>
+      <table class="order_details">
+        <thead>
+          <th>Codigo</th>
+          <th>Descrip.</th>
+          <th>Cantidad</th>
+          <th>% Desc</th>
+          <th>Precio</th>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <table class="simpleCart_totals" align="right">
+        <tr>
+          <th >Cantidad:</th>
+          <td><span class="order-items"></span></td>
+        </tr>
+        <tr>
+          <th >Descuentos:</th>
+          <td><span class="simpleCart_desc"></span></td>
+        </tr>
+        <tr>
+          <th>Sub-Total:</th>
+          <td><span class="order-subtotal"></span></td>
+        </tr>
+        <tr>
+          <th>I.V.A.:</th>
+          <td><span class="order-iva"></span></td>
+        </tr>
+        <tr>
+          <th>Total:</th>
+          <td><span class="order-total"></span></td>
+        </tr>
+      </table>
+    </div>
+  	<div data-role="footer" data-position="fixed" style="background-color: #0188C8; color: #FFFFFF">
+      <h4>s4GcomWeb © Seu4 Plus 2017</h4>
+    </div>
+  </div>
+</body>
+</html>

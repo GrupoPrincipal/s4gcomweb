@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+    <link href="<?php echo DOMAIN_ROOT ?>css/components.css" rel="stylesheet" id="style_components" type="text/css" />
+    <link href="<?php echo DOMAIN_ROOT ?>css/plugins.css" rel="stylesheet" id="style_components" type="text/css" />
+</head>
+
+<body>
+ <div data-role="page" id="client-list-page" style="background-color: #DAE0EE">
+  	<div data-role="header" style="background-image: url(<?php echo DOMAIN_ROOT ?>images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+      
+      <?php include("header_seller.phtml"); ?>
+    </div>
+    
+     
+     
+  	
+    				 		
+    
+    <div role="main" class="ui-content row">
+    <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+       
+        
+         <div class="portlet light bordered">
+                    <div class="portlet-title">
+                        <div class="caption">
+                           
+                        
+                        </div>
+                       
+                    </div>
+                  
+                        
+               
+            <div data-role="collapsibleset">
+			   <div class="table-responsive">  
+			     <table id="" class="display" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Nro Factura</th>
+                            <th>Fecha Factura</th>			
+                            <th>Fecha Pago</th>
+                            <th>Monto Factura</th>
+                            <th>Forma Pago</th>
+                            <th>Monto Pago</th>
+                            <th>Nro Cheque</th>
+                            <th>Banco</th>
+                            <th style="text-align: right">Límite Crédito</th>                                
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        foreach($data as $d){ ?>            
+                        <tr>
+                            <td><?php echo $d['codiclie'] ?></td>
+                            <td><?php echo $d['numedocu'] ?></td>
+                            <td><?php echo $d['fecha'] ?></td>
+                            <td><?php echo $d['fcancel'] ?></td>
+                            <td style="text-align: right"><?php echo $d['monto'] ?></td>
+                            <td><?php echo $d['tipocobr'] ?></td>
+                            <td><?php echo $d['montret'] ?></td>
+                            <td><?php echo $d['cheque'] ?></td>
+                            <td><?php echo $d['banco'] ?></td>
+                            <td><?php echo $d['limicred'] ?></td>
+                            
+                        </tr>
+                        <?php
+                        }   
+                       ?>
+
+
+                    </tbody>
+			    </table>
+			   </div>
+			</div>
+            </div>
+  
+	</div>
+
+</div>    
+      
+    </div>
+<div data-role="footer" data-position="fixed" style="background-color: #0188C8; color: #FFFFFF">
+      <h4>Grupo Principal © <?php echo date("Y"); ?></h4>
+    </div>
+  </div>
+<script>
+    $(function(){
+      $('table.display').DataTable();
+  })
+</script>
+</body>
+</html>

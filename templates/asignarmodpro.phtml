@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+
+<body >
+<div data-role="page" id="detail" >    
+    <div data-role="header">
+     <a href="#" onclick="" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-left">Close</a>
+        <h2 style="color: #3849b1">Asignar Modulos</h2>
+    </div>
+      <!-- ## Contenedor principal ## -->
+    <div role="main" class="ui-content row">
+    <div class="row">
+    <div class="col-md-10 col-md-offset-1">    
+       <div role="main" class="ui-content">
+            <div data-role="collapsibleset">
+              <form type="POST" action="/savemod">                
+                <table class="table">
+                <?php foreach($data as $value){     ?>      
+                 <tr>
+                 	<td style="position: inherit;"><?php  if($value['ESTATUS']=='1'){  $ban="checked"; }else $ban="";?>
+                        <input class="amod" type="checkbox"   style="width: 18px;position: inherit;" data-id="<?php echo $value['ID']; ?>"  <?php echo $ban; ?>></td>
+                 	<td><strong><?php echo $value['NOMBRE']; ?></strong></td>
+                 </tr>
+                <?php } ?>
+                </table>
+                
+                <button type="button"  onclick="guardar();" class="btn btn-default"  id="btn" name="btn"><strong>Guardar</strong></button>
+
+                
+             </form>
+                </div>
+             <div class="errores alert alert-info" id="mensaje">
+                  <strong>Modulos Asignados</strong>
+                </div>
+			</div>
+		</div>
+	</div>
+ </div>
+</div>
+<script>
+	
+
+</script>
+</body>
+</html>

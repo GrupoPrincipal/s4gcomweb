@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+
+ <?php include("enlaces.phtml"); ?>
+
+</head>
+
+<body>
+<div data-role="page" id="admin-ini-page" >
+  	<div data-role="header" style="background-image: url(images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+        <?php include("headeradm.phtml"); ?>
+         <a href="#" data-rel="back" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Volver</a>
+    </div>
+      <!-- ## Contenedor principal ## -->
+    <div role="main" class="ui-content">
+    <br>
+    
+      <!-- ## Contenedor principal ## -->
+    <div class="container">  
+    <div class="row">
+    <div class="col-md-12">
+     <div class="well well-sm">
+     <div class="panel panel-default">
+	      <div class="panel-heading">
+	         <strong>Pagos de Factura</strong>	
+	      </div>
+		      <div class="panel-body">
+					 <form class="form-horizontal" method="POST" id="forma" action="pagosday">
+					
+		               <div class="form-group">
+		                <label class="col-md-12"><strong>Rutas</strong></label>
+		                <div class="col-md-3">                 
+		       			  <select class="form-control" id="rutas" name="rutas">
+			       			  <option value="0">Seleccione</option>
+			       			<?php foreach ($data as $d) { ?>	       			
+			       			      <option value="<?php echo $d['CODIRUTA']; ?>"><?php echo $d['CODIRUTA']; ?></option>
+			       			<?php } ?>
+			       		  </select>
+			       		  </div>
+		               </div>
+		               <div class="form-group">
+		                  <div class="col-md-4">
+		               		
+		               	  </div>
+			               	  <div class="errores alert alert-danger" id="mensaje1">
+	                            <strong>Seleccione una ruta</strong>
+	                          </div>
+		               </div>
+		            
+		                 <label class="col-md-12"><strong>Fecha</strong></label>
+		                   <div class="col-md-3">   
+		                 	    <input  id="fechaini" name="fechaini" placeholder="Fecha Inicio"  type="text"/>
+		                   </div>
+		                   <div class="col-md-3">   
+		                 	    <input  id="fechafin" name="fechafin" placeholder="Fecha Fin" type="text"/>
+		                   </div>
+		            
+		                 	  <div class="errores alert alert-danger" id="mensaje2">
+	                            <strong>Ingrese una fecha de inicio</strong>
+	                          </div>
+	                          <div class="errores alert alert-danger" id="mensaje3">
+	                            <strong>Ingrese una fecha final</strong>
+	                          </div>
+		               <div class="form-group">
+		                  <div class="col-md-2">
+		               		<button type="button" onclick="gpagos()" class="btn btn-default"><strong>Buscar</strong></button>
+		               	  </div>			               	
+		               </div>
+		             
+		            </form>
+				</div>
+	   </div>  
+	 </div>
+	</div>
+
+
+	<!-- contenedor de listado -->
+	<div role="main" class="ui-content row">
+    <div class="row" id="facturas" style="display:none;">
+    <div class="col-md-10 col-md-offset-1">
+       <div role="main" class="ui-content" >
+            <div data-role="collapsibleset">
+			   <div class="table-responsive">  
+			      <table id="datatable" class="table table-hover table-condensed" >
+			                    <thead>
+			                        <tr>
+			                        	<th>N° Factura</th>
+			                        	<th>Cliente</th> 
+			                            <th>Fecha</th>
+			                            <th>N° Referencia</th>
+			                            <th>Modo de pago</th>
+			                            <th>Banco</th>			                            
+			                            <th style="text-align: right">Monto</th> 
+			                            <th>&nbsp;</th>			   		                            			                                                   
+			                        </tr>
+			                    </thead>
+			                    <tbody class="listapagos">
+			                        
+
+
+			                    </tbody>			       
+			     </table>
+			   </div>
+			</div>
+	     </div>
+
+  
+	</div>
+
+  </div>
+</div>
+ <div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF;">
+      <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+ </div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
+<script>
+ $(function(){
+    $('#datatable').DataTable();
+ })
+
+ $(document).ready(function(){
+      var date_input=$('input[name="fechaini"]'); //our date input has the name "date"
+      var container=$('.bootstrap-iso form').length>0 ? $('.bootstrap-iso form').parent() : "body";
+      var options={
+        format: 'yyyy-mm-dd',
+        container: container,
+        todayHighlight: true,
+        autoclose: true,
+
+      };
+      date_input.datepicker(options);
+    })
+
+ $(document).ready(function(){
+      var date_input=$('input[name="fechafin"]'); //our date input has the name "date"
+      var container=$('.bootstrap-iso form').length>0 ? $('.bootstrap-iso form').parent() : "body";
+      var options={
+        format: 'yyyy-mm-dd',
+        container: container,
+        todayHighlight: true,
+        autoclose: true,
+
+      };
+      date_input.datepicker(options);
+    })
+</script>
+
+</body>
+</html>

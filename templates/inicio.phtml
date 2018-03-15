@@ -1,0 +1,132 @@
+<?php 
+$title="Inicio";
+$dia=array(1=>"Lunes",2=>"Martes",3=>"Miercoles",4=>"Jueves",5=>"Viernes",6=>"Sabado",7=>"Domingo");
+
+?>
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+</head>
+
+<body>
+    <b  class='capture-metadata' data-sesion='0'></b>
+  <div data-role="page" id="admin-ini-page" >
+  	<div data-role="header" style="background-image: url(images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+        <?php include("header.phtml"); ?>
+    </div>
+      <!-- ## Contenedor principal ## -->
+    <div role="main" class="ui-content">
+<br><br>
+<div class="row">
+    <div class="col-md-2 col-md-offset-1">        
+        <div data-role="controlgroup" data-theme="e" >
+            <a href="#" data-role="button"><span>Día de visita: <b class=" info-visita " ><?php echo $dia['1']; ?></b></span></a>
+            <a href="#"  onclick="redirect('facturaxpagar')" data-role="button" transition="flip" data-rel="dialog" data-theme="d"><span>Doc. Pendientes</span></a>
+            <a href="vencidos" data-role="button" transition="flip" data-rel="dialog" data-theme="d"><span>Doc. Vencidos</span></a>
+        </div>
+    </div>
+    <div class="col-md-5" id="listado">
+       <div role="main" class="ui-content">
+      <div data-role="collapsibleset" class="list-fecturas" >
+           <ul data-role="listview"  data-inset="true" class="listview">
+                <li><table  class="lista-table"><tr><th>Fecha</th><th>Pedido</th></tr></table></li>
+           </ul>
+      </div>
+    </div>
+    </div>
+    <div class="col-md-3">
+        <h3 class="pedido">Pedido: <span id="n-pedi"></span> </h3>
+        
+        <div class="semi-circulo" onready="index()">
+            <div class="semi-circulo2 " style="top: 62px;">
+                <img src="images/aguja.png" id="aguja">
+            </div>
+        </div>
+        
+        
+        <div class="leyenda">
+            <br>
+        <ul>
+            <li><span></span>Sin facturar</li>
+            <li><span></span>Facturado</li>
+            <li><span></span>Por despachar</li>
+            <li><span></span>Despachado</li>
+        </ul>
+        </div>
+            <center><a href="#" data-role="button" class="detalles" onclick="redirect()" data-theme="d" >Detalles</a></center>
+    </div>
+
+</div>
+
+<script>
+ $(function(){
+     _tmp.tipo=0;
+      var pag = $('.list-fecturas'); 
+            $.ajax({
+              url: server + "facturas",
+              type: "GET",
+              dataType: "json"
+            }).done(function(response){
+                var element = "";
+                $.each(response, function(i){
+                    var format= this.FECHA.split(' ');
+                    this.FECHA=format[0];
+                    element = '<li class="ui-first-child ui-last-child"><a class="ui-btn ui-btn-icon-right ui-icon-carat-r" onclick=redirect("detalle/'+this.NUMEPEDI+'") href="#"><table class="lista-table"><tr><td>'+this.FECHA+'</td><td>'+this.NUMEPEDI+'</td></tr></table></a></li>';
+                    pag.children(".listview").append(element);
+                });
+               // $('.list-fecturas').text(response);
+            });
+           
+                $.ajax({
+                  url: server + "facturas/ultima",
+                  type: "GET",
+                  dataType: "json"
+                }).done(function(response){
+                    console.log(response);
+                    $('#n-pedi').append("<b>"+response.NUMEPEDI+"</b>");
+                    $('.detalles').attr('onclick','redirect("detalle/'+response.NUMEPEDI+'")');
+                    if(response.MOTIRECH=='K'){
+                       $('#aguja').removeClass();
+                       $('#aguja').addClass('facturado');
+                     }
+                    if(response.NUMEGUIA.trim() != ''){
+                        $('#aguja').removeClass();
+                       $('#aguja').addClass('enguia');
+                    }
+                    if(response.FENTREGA > '0000-00-00'){
+                        $('#aguja').removeClass();
+                       $('#aguja').addClass('despachado');
+                    }
+                });
+     
+            $.ajax({
+                  url: server + "client/detail",
+                  type: "GET",
+                  dataType: "json"
+                }).done(function(response){
+               var dia = {"1":"Lunes","2":"Martes","3":"Miercoles","4":"Jueves","5":"Viernes","6":"Sabado","7":"Domingo"};
+                    $('.info-dias').text(response.DIASCRED);
+                    $('.info-credito').text(response.LIMICRED);
+                    $('.info-visita').text(dia[response.DIAVISI]);
+                });
+ })
+function cargar(){
+    $('#datatable').DataTable();
+}
+function verdetalle(e){
+    var p= $(e).data('pedido');
+    
+}
+
+</script>
+
+  </div>
+      <!-- ## FIN contenedor principal ## -->
+      
+  	<div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF;">
+      <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+    </div>
+  </div>
+</body>
+</html>

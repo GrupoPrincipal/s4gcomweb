@@ -1,0 +1,26 @@
+<?php
+define ( 'DOMAIN_ROOT', 'https://' . $_SERVER ['SERVER_NAME'] . '/s4gcomweb/public/' );
+?>
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+
+<body>
+<div data-role="page" id="detail" >    
+    <div data-role="header">
+        <h2 style="color: #3849b1">Captura de Pantalla</h2>
+    </div>
+      <!-- ## Contenedor principal ## -->
+    <div role="main" class="ui-content row">
+
+           <div role="main" class="ui-content">
+                <div data-role="collapsibleset">
+
+                      <img src="<?php echo DOMAIN_ROOT ?>imagen/<?php echo $data['IMAGEN']; ?>"/>
+                </div>
+            </div>
+        </div>  
+  </div>
+</body>
+</html>

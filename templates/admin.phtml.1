@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>S4GCOMWEB</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css" />
+  <link rel="stylesheet" href="css/app.css" />
+  <script src="js/jquery-2.1.4.min.js"></script>
+  <script src="js/jquery.mobile-1.4.5.min.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/app.js"></script>
+</head>
+
+<body>
+  <div data-role="page" id="admin-main-page" style="background-color: #DAE0EE">
+  	<div data-role="header" style="background-color: #004372; color: #DAE0EE">
+      <h1>Módulo Administrativo</h1>
+      <a href="#!" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-power logout-action">Salir</a>
+    </div>
+    <div role="main" class="ui-content">
+      <ul data-role="listview" data-inset="true">
+        <li><a href="#new-account-page">Crear nueva cuenta</a></li>
+        <li><a href="#update-account-page">Actualizar / Eliminar Cuentas</a></li>
+      </ul>
+    </div>
+  	<div data-role="footer" data-position="fixed" style="background-color: #0188C8; color: #FFFFFF">
+      <h4>s4GcomWeb © Seu4 Plus 2017</h4>
+    </div>
+  </div>
+
+  <div data-role="page" id="new-account-page" style="background-color: #00639E">
+  	<div data-role="header" style="background-color: #004372; color: #DAE0EE">
+      <a href="#" data-rel="back" class="ui-btn-left ui-btn

@@ -1,0 +1,14 @@
+<?php
+session_start();
+error_reporting(0);
+ini_set(display_errors, 0);
+$user=$_GET['user'];
+$user=base64_decode($user);
+$user=json_decode($user);
+$user=get_object_vars($user);
+$user['details']=get_object_vars($user['details']);
+$user['info']=get_object_vars($user['info']);
+$_SESSION['user']=$user;
+
+header("location: public");
+?>

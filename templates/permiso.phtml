@@ -1,0 +1,96 @@
+<?php 
+$title="Inicio";
+$dia=array(1=>"Lunes",2=>"Martes",3=>"Miercoles",4=>"Jueves",5=>"Viernes",6=>"Sabado",7=>"Domingo");
+
+?>
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+       <link href="<?php echo DOMAIN_ROOT ?>css/components.css" rel="stylesheet" id="style_components" type="text/css" />
+    <link href="<?php echo DOMAIN_ROOT ?>css/plugins.css" rel="stylesheet" id="style_components" type="text/css" />
+</head>
+
+<body>
+    <b  class='capture-metadata' data-sesion='0'></b>
+  <div data-role="page" id="admin-ini-page" >
+  	        <?php include("header_dinamic.phtml"); ?>
+    </div>
+      <!-- ## Contenedor principal ## -->
+    <div role="main" class="ui-content">
+<br><br>
+<div class="row">
+    <div class="col-md-10 col-md-offset-1">
+        <form method="post" id="permisos">
+        <?php foreach($data['modulos'] as $k => $v){ ?>        
+          <div class="portlet box blue  col-lg-12">
+            <div class="portlet-title <?php echo $v['iconmodu']; ?> ui-btn-icon-left">
+                <div class="caption">&nbsp; &nbsp; &nbsp; &nbsp;<?php echo $v['descmodu']; ?> </div>
+                <div class="tools">
+                   <input type="checkbox" value="<?php echo $v['codemodu'] ?>"  style="margin: -3px -30px 0;" name="modulo[]" data-idmod="<?php echo $v['codemodu'] ?>" <?php if($v['asignado']==1){ ?>selected <?php } ?> >
+                  <?php
+                    if(!empty($v['submodulos'])){
+                    ?>
+                  <a href="javascript:;" class="expand" data-original-title="" title=""> </a>
+                    <?php
+                    }
+                    ?>
+                </div>
+            </div>
+            <?php
+            if(!empty($v['submodulos'])){
+                foreach( $v['submodulos'] as $key => $val){
+            ?>
+            <div class="portlet-body " style="display: none;">
+                 <table  class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th style="width:90%">Submodulo</th>
+                                <th style="width:10%">Permiso</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <tr>
+                                <th><?php echo $val['descsmod'];  ?></th>
+                                <td><?php echo $val['asignado'];  ?></td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </div>
+            <?php
+                }
+            }
+            ?>
+        </div>
+        <?php } ?>
+            <input type="hidden" name="user" value="<?php echo $data['user']; ?>">
+            <center><button type="button" onclick="guardar()" class="btn btn-primary">Guardar</button></center>  
+        </form>
+      
+    </div>
+</div>
+
+<script>
+ $(function(){
+     $('.expand').click(function(){
+         $(this).parents('.portlet').children('.portlet-body').toggle({'display':'block'},500);
+     })
+     
+ });
+function guardar(){
+    $.post("<?php echo DOMAIN_ROOT ?>savepermisos",$('#permisos').serialize(),function(e){
+             console.log(e);
+    });
+}
+</script>
+
+  </div>
+      <!-- ## FIN contenedor principal ## -->
+      
+  	<div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF;">
+      <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+    </div>
+  </div>
+</body>
+</html>

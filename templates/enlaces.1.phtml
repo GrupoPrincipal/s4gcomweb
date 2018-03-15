@@ -1,0 +1,60 @@
+?php
+
+?>
+<title>Grupo Principal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="<?php echo DOMAIN_ROOT ?>css/estilos.css" />
+    <link rel="stylesheet" href="<?php echo DOMAIN_ROOT ?>css/jquery.mobile-1.4.5.min.css" />
+    <link rel="stylesheet" href="<?php echo DOMAIN_ROOT ?>css/app.css" />
+    
+    <link rel="stylesheet" href="<?php echo DOMAIN_ROOT ?>css/bootstrap.css" />
+    <link rel="stylesheet" href="<?php echo DOMAIN_ROOT ?>js/datatables/datatables.css" />
+
+    <script src="<?php echo DOMAIN_ROOT ?>js/jquery-2.1.4.min.js"></script>
+    <script src="<?php echo DOMAIN_ROOT ?>js/jquery.mobile-1.4.5.min.js"></script>
+    <script src="<?php echo DOMAIN_ROOT ?>js/simplecart.js"></script>
+    <script src="<?php echo DOMAIN_ROOT ?>js/cart-init.js"></script>
+    <script src="<?php echo DOMAIN_ROOT ?>js/core.js"></script>
+    <script src="<?php echo DOMAIN_ROOT ?>js/app.js"></script>
+    <script src="<?php echo DOMAIN_ROOT ?>js/bootstrap.js"></script>
+    <script src="<?php echo DOMAIN_ROOT ?>js/datatables/datatables.js"></script>
+    <script src="<?php echo DOMAIN_ROOT ?>js/bootstrap-datepicker.min.js"></script>
+
+<!--<link rel="stylesheet" id="us-font-2-css" href="https://fonts.googleapis.com/css?family=Open+Sans%3A400%2C400italic%2C600&amp;subset=latin&amp;ver=4.8.1" type="text/css" media="all">
+<link rel="stylesheet" id="us-font-1-css" href="https://fonts.googleapis.com/css?family=Roboto%3A300%2C400%2C700&amp;subset=latin&amp;ver=4.8.1" type="text/css" media="all">
+-->
+
+
+<link rel="shortcut icon" href="<?php echo DOMAIN_ROOT ?>images/gdp_icon.png" />
+<script>
+ function redirect(url){
+    if(url=='pedidos'){
+        var fecha = new Date();
+        var diasemana=fecha.getDay();
+        var dias = new Array(7);
+        dias[0]="Domingo";
+        dias[1]="Lunes";
+        dias[2]="Martes";
+        dias[3]="Miércoles";
+        dias[4]="Jueves";
+        dias[5]="Viernes";
+        dias[6]="Sábado";    
+        $.ajax({
+          url: server + "limites",
+          type: "GET",
+          dataType: "json"
+        }).done(function(response){
+           //alert(diasemana+"--__--"+response[0].DIAVISI);
+          if(response[0].DIAVISI != diasemana){
+               alert("Su dia de visita es el "+dias[response[0].DIAVISI]+" solo puede realizar pedidos ese dia.");
+           }else{
+               window.location.assign("<?php echo DOMAIN_ROOT ?>"+url);
+           }
+        });
+        
+    }else{
+        window.location.assign("<?php echo DOMAIN_ROOT ?>"+url);
+    }
+    
+}
+</script>

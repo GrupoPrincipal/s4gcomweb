@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+   <link href="<?php echo DOMAIN_ROOT ?>css/components.css" rel="stylesheet" id="style_components" type="text/css" />
+    <link href="<?php echo DOMAIN_ROOT ?>css/plugins.css" rel="stylesheet" id="style_components" type="text/css" />
+</head>
+<style>
+    input[type="radio"], input[type="checkbox"] {
+        margin: 0 !important;
+    }
+</style>
+<body>
+  <div data-role="page" id="admin-main-page" style="background-color: #DAE0EE">
+  	<div data-role="header" style="background-image: url(images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+       <?php  include("headeradm.phtml"); ?>
+        <a href="#" data-rel="back" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Volver</a>
+    </div>
+    <div role="main" class="ui-content">   
+       <br><br>
+       <div class="row">
+           <div class="col-md-10 col-md-offset-1">
+               
+               <div class="portlet light bordered">
+                    <div class="portlet-title">
+                        <div class="caption">
+                           Limitar monto minimo del pedido por: 
+                        
+                        </div>
+                       
+                    </div>
+                   <form>
+                            <fieldset data-role="controlgroup" data-type="horizontal">
+                                <input  type="radio" name="radio-choice-h-2 radio-val" onclick="validarlimit(this)" id="radio-choice-h-2a" data-value="1">
+                                <label for="radio-choice-h-2a">Cliente</label>
+                                <input  type="radio" name="radio-choice-h-2 radio-val" onclick="validarlimit(this)" id="radio-choice-h-2b" data-value="2">
+                                <label for="radio-choice-h-2b">Canal</label>
+                                <input  type="radio" name="radio-choice-h-2 radio-val" onclick="validarlimit(this)" id="radio-choice-h-2c" data-value="3">
+                                <label for="radio-choice-h-2c">Todos</label>
+                            </fieldset>
+                        </form>
+                        <!-- BEGIN FORM-->
+                        
+                </div>
+               
+               
+
+           </div>
+           <div class="col-md-10 col-md-offset-1 ">
+               
+               
+               <div class="portlet light bordered portlet-content-clie" style="display:none;">
+                    <div class="portlet-title portlet-clientes">
+                        <div class="caption">
+                           Seleccionar clientes: 
+                        
+                        </div>
+                        &nbsp; &nbsp; &nbsp; &nbsp;
+                       
+                    </div>
+                   <div class="portlet-title">
+                       <table id="" class="display" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>                          
+                            <th>Codigo</th>
+                            <th>Cliente</th>
+                            <th>Monto min.</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                     <tbody>                      
+                        <?php 
+                        foreach($data as $d){ ?>
+                        <tr>                            
+                            <td><?php echo $d['CLIEV_IDCLIENTE']; ?></td>
+                            <td><?php echo $d['CLIEV_NOMBRE']; ?></td>
+                            <td style="text-align:right;"><?php echo number_format($d['montlimi']+0,2,",","."); ?></td>
+                            <td><center><input type="checkbox" onclick="inptslect(this)" class="cliente" name="client[]" style="margin-top: -10px !important;" id="" value="<?php echo $d['CLIEV_IDCLIENTE']; ?>" class="client"></center></td>
+                        </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+                       <div class="list-inputs"></div>
+                   </div>
+                   
+                        
+                </div>
+               
+               
+               
+               
+           </div>
+        </div>
+           <div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF">
+                   <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+
+            </div>
+    
+      </div>
+ </div>
+<script>
+$(function(){
+    $('table.display').DataTable();
+})
+    
+function lprompt(txt,resp){
+    
+    resp = prompt(txt);
+      if(!resp.match(/^[0-9]+$/)){
+         resp = lprompt('Debe ingresar solo numeros \n Monto minimo:');
+      }
+     return resp;
+} 
+function inptslect(e){
+    var c= false;
+    var v=$(e).val();
+    $('.list-inputs').children('.'+v).remove();
+    if($(e).is(':checked')){
+        $('.list-inputs').append("<input type='hidden' class='list-client "+v+"' value='"+v+"'>");
+    }
+    $('.list-client').each(function(){
+        c=true;
+    })
+    $(".portlet-botton").remove();
+    if(c==true){
+        $(".portlet-clientes").append(' <button onclick="validarlimit(this)" data-value="4" class="btn btn-primary portlet-botton"> Guardar</button>');
+    }
+}
+ function denyCallback(){
+     infoAlert("Informacion","Asignacion de monto minimo de pedido cancelado");
+ }
+function validarlimit(e){
+    var tipo= $(e).data("value");
+    if(tipo==1){
+       $(".portlet-content-clie").fadeIn();
+    }else if(tipo==2){
+        $(".portlet-content-clie").fadeOut();
+        $.ajax({
+              url: "<?php echo DOMAIN_ROOT ?>canales",
+              type: "GET",
+              dataType: "json",
+            }).done(function(response){
+            console.log(response);
+            var select='<select id="canal" class="form-control">';
+            var option='';
+            var canales=[];
+            for (var i=0; i<response.length; i++) {
+                option+="<option class='canal' value='"+response[i].CODIGCLI+"'>"+response[i].GRUPCLIE+"</option>";
+                canales[response[i].CODIGCLI]=response[i].GRUPCLIE;
+            }
+            select=select+option+'</select>';
+              $.jAlert({
+                    'type': 'confirm', 
+                    'confirmQuestion': select,
+                    confirmBtnText:"SI",
+                    denyBtnText:"NO",
+                    'onConfirm': function(){
+                        
+                        var canal=$('#canal').val();
+                        var resp= lprompt('Monto minimo:');
+                        $.jAlert({
+                            'type': 'confirm', 
+                            'confirmQuestion': "Confirme monto minimo "+resp+" de los pedidos a todos los clientes del canal "+canales[canal],
+                            confirmBtnText:"SI",
+                            denyBtnText:"NO",
+                            'onConfirm': function(){
+                                resp="monto="+resp+"&clientes=canal&canal="+canal;
+                                 $.ajax({
+                                  url: "<?php echo DOMAIN_ROOT ?>minimo",
+                                  type: "POST",
+                                  data: resp,
+                                  dataType: "json",
+                                }).done(function(response){ 
+                                  console.log(response);
+                                     successAlert("Exito","Monto minimo de pedido asignado");
+                               });
+
+                            },
+                            'onDeny': denyCallback 
+                        });
+                        
+                    }
+                });
+           });
+        
+    }else if(tipo==3){
+        $(".portlet-content-clie").fadeOut();
+        var resp=prompt('Monto minimo:');
+        if(resp){
+            if(!resp.match(/^[0-9]+$/)){
+              resp= lprompt('Monto minimo:'); 
+            }
+            
+            $.jAlert({
+                'type': 'confirm', 
+                'confirmQuestion': "Confirme monto minimo "+resp+" de los pedidos a todos los clientes ",
+                confirmBtnText:"SI",
+                denyBtnText:"NO",
+                'onConfirm': function(){
+                    resp="monto="+resp+"&clientes=all";
+                     $.ajax({
+                      url: "<?php echo DOMAIN_ROOT ?>minimo",
+                      type: "POST",
+                      data: resp,
+                      dataType: "json",
+                    }).done(function(response){ 
+                      console.log(response);
+                         successAlert("Exito","Monto minimo de pedido asignado");
+                   });
+                    
+                },
+                'onDeny': denyCallback 
+            });
+        }else{
+            alert("Proceso cancelado");
+        } 
+        
+    }else if(tipo==4){
+            var inputs='';
+            var clie=[];
+            $(".list-client").each(function(){
+                    
+                  clie.push($(this).val());
+            });
+        inputs=clie;
+            var canal=$('#canal').val();
+            var resp= lprompt('Monto minimo:');
+            $.jAlert({
+                'type': 'confirm', 
+                'confirmQuestion': "Confirme monto minimo "+resp+" de los pedidos a los clientes seleccionados",
+                confirmBtnText:"SI",
+                denyBtnText:"NO",
+                'onConfirm': function(){
+                    resp="monto="+resp+"&clientes=clientes&lista="+inputs;
+                     $.ajax({
+                      url: "<?php echo DOMAIN_ROOT ?>minimo",
+                      type: "POST",
+                      data: resp,
+                      dataType: "json",
+                        success: function(response){
+                            //console.log(response);
+                         successAlert("Exito","Monto minimo de pedido asignado");
+                        }
+                    });
+                },
+                'onDeny': denyCallback 
+            });
+   }
+}
+</script>
+</body>
+</html>

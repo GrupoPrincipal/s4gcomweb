@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+    <link href="<?php echo DOMAIN_ROOT ?>css/components.css" rel="stylesheet" id="style_components" type="text/css" />
+    <link href="<?php echo DOMAIN_ROOT ?>css/plugins.css" rel="stylesheet" id="style_components" type="text/css" />
+    <script src='<?php echo DOMAIN_ROOT ?>js/highcharts/js/highcharts.js'></script>
+        <link rel="stylesheet" href="<?php echo DOMAIN_ROOT ?>js/daterangepicker/daterangepicker.css" />
+    <script src="<?php echo DOMAIN_ROOT ?>js/daterangepicker/moment.js"></script>  
+    <script src="<?php echo DOMAIN_ROOT ?>js/daterangepicker/daterangepicker.js"></script>
+</head>
+
+<body>
+  <div data-role="page" id="admin-ini-page" >
+  	<div data-role="header" style="background-image: url(images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+        <?php include("header_lider.phtml"); ?>
+    </div>
+      <!-- ## Contenedor principal ## -->
+    <div role="main" class="ui-content">
+<br><br>
+<div class="row">
+    <?php
+    $rutas=array();
+    foreach($data as $key => $val ){
+        foreach($data[$key] as $k => $v){
+            $rutas[$k][$key]=$data[$key][$k];
+        }
+     }
+    $grafic=array();
+    foreach($rutas as $key => $val){
+        foreach($rutas[$key] as $k => $v){
+            $tltv=$rutas[$key][$k]['total']['D']+0;
+            $grafic[$key].='{ name: "'.$k.'",y:'.$tltv.'},';
+        }
+      $grafic[$key] = substr($grafic[$key], 0, -1);
+     ?>
+    <script>
+$(function(){
+Highcharts.chart('ruta_<?php echo $key; ?>', {
+    chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie'
+    },
+    title: {
+        text: 'Porcentaje de cobranza segun dias vencidos'
+    },
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+    },
+    plotOptions: {
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: false,
+                format: '<b>{point.name}</b>: {point.percentage:.2f} %',
+                style: {
+                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                }
+            },
+            showInLegend: true
+        }
+    },
+    series: [{
+        name: 'porcentaje',
+        colorByPoint: true,
+        data: [<?php echo $grafic[$key]; ?>]
+    }]
+});
+    
+});
+
+
+</script>
+    <?php
+    }
+    ?>
+    <div class="col-md-10 col-md-offset-1 row" id="listado">
+        <?php
+        foreach($_SESSION['user']['rutas'] as $r){
+         $cdr=$r['CODIRUTA'];
+            $t[$cdr]+=$rutas[$cdr]['2d']['total']['D'];
+            $t[$cdr]+=$rutas[$cdr]['7d']['total']['D'];
+            $t[$cdr]+=$rutas[$cdr]['15d']['total']['D'];
+            $t[$cdr]+=$rutas[$cdr]['21d']['total']['D'];
+            
+            $te[$cdr]+=$rutas[$cdr]['2d']['total']['ED'];
+            $te[$cdr]+=$rutas[$cdr]['7d']['total']['ED'];
+            $te[$cdr]+=$rutas[$cdr]['15d']['total']['ED'];
+            $te[$cdr]+=$rutas[$cdr]['21d']['total']['ED'];
+        ?>
+        
+            <div class="col-md-4">
+                
+                
+                <div class="portlet light">
+                        <div class="portlet-title">
+                            <div class="caption font-green-sharp">
+                                <i class="icon-speech font-green-sharp"></i>
+                                <span class="caption-subject">
+                                    <?php echo $cdr; ?>: <?php echo $r['NOMBVEND']; ?>
+                                <li class="dropdown  " style="    list-style: none; float: right; margin-right: -60px; top: -24px;">
+                                    <a href="#" class="dropdown-toggle ui-btn-left ui-corner-all" data-toggle="dropdown">
+                                        <b class="ui-btn-inline ui-icon-bars ui-btn-icon-left"></b>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="./pedidos/<?php echo $cdr ?>">Ver Pedidos</a></li>
+                                        <li><a href="./pago/<?php echo $cdr ?>">Ver pagos</a></li>
+                                        <li><a href="./cheques/<?php echo $cdr ?>">Cheques devueltos</a></li>
+                                    </ul>
+                                </li>
+                     
+                                </span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="ruta_<?php echo $r['CODIRUTA']; ?>" class="col-md-12"> </div>
+                        </div>
+                    <div class="portlet-footer">
+                            <div class="caption font-blue-hoki">
+                               <table class="table table-bordered table-striped table-condensed flip-content">
+                                    <tr>
+                                        <td>&nbsp;</td>
+                                        <td>Despachado</td>
+                                        <td>En espachado</td>
+                                   </tr>
+                                    <tr>
+                                        <td>2 dias</td><td><?php echo number_format($rutas[$cdr]['2d']['total']['D'], 2, ',', '.'); ?></td>
+                                        <td>
+                                        <?php  
+                                            if(isset($rutas[$cdr]['2d']['total']['ED'])){
+                                                echo number_format($rutas[$cdr]['2d']['total']['ED'], 2, ',', '.');
+                                            }else{
+                                                echo "0"; 
+                                            }
+                                            ?>
+                                        </td>
+                                   </tr>
+                                    <tr>
+                                        <td>7 Dias</td><td><?php echo number_format($rutas[$cdr]['7d']['total']['D'], 2, ',', '.'); ?></td>
+                                        <td>
+                                        <?php  
+                                            if(isset($rutas[$cdr]['7d']['total']['ED'])){
+                                                echo number_format($rutas[$cdr]['7d']['total']['ED'], 2, ',', '.');
+                                            }else{
+                                                echo "0"; 
+                                            }
+                                        ?></td>
+                                   </tr>
+                                    <tr>
+                                        <td>15 dias</td><td><?php echo number_format($rutas[$cdr]['15d']['total']['D'], 2, ',', '.'); ?></td>
+                                        <td>
+                                        <?php 
+                                            if(isset($rutas[$r['CODIRUTA']]['15d']['total']['ED'])){
+                                                echo number_format($rutas[$cdr]['15d']['total']['ED'], 2, ',', '.');
+                                            }else{
+                                                echo "0"; 
+                                            }
+                                            ?>
+                                        </td>
+                                   </tr>
+                                    <tr>
+                                        <td>21 o +</td><td><?php echo number_format($rutas[$cdr]['21d']['total']['D'], 2, ',', '.'); ?></td>
+                                        <td>
+                                        <?php
+                                            if(isset($rutas[$cdr]['21d']['total']['ED'])){
+                                                echo number_format($rutas[$cdr]['21d']['total']['ED'], 2, ',', '.');
+                                            }else{
+                                                echo "0"; 
+                                            }
+                                            ?>
+                                        </td>
+                                   </tr>
+                                    <tr>
+                                        <td>TOTAL</td><td><?php echo number_format($t[$cdr], 2, ',', '.'); ?></td><td><?php echo number_format($te[$cdr], 2, ',', '.'); ?></td>
+                                   </tr>
+                                </table>
+                            </div>
+                     </div>
+                </div>
+                
+            </div>
+        <?php
+        }
+        ?>
+    </div>
+  
+</div>
+
+
+
+  </div>
+      
+
+      
+  	<div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF;">
+      <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+    </div>
+  </div>
+</body>
+</html>

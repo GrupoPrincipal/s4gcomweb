@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+   <link href="<?php echo DOMAIN_ROOT ?>css/components.css" rel="stylesheet" id="style_components" type="text/css" />
+    <link href="<?php echo DOMAIN_ROOT ?>css/plugins.css" rel="stylesheet" id="style_components" type="text/css" />
+<style>
+
+.cubo, .cubo .cara{
+  height: 140px;
+}
+.cara img{
+  height: 140px;
+}
+.cubo {
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+
+    -webkit-transform: rotateX(0deg) rotateY(0deg);
+    transform: rotateX(0deg) rotateY(0deg);
+    
+    -webkit-transition: all .2s ;
+    -moz-transition: all .2s ;
+    transition: all .2s ;
+    
+        margin: 0px;
+    cursor: :pointer;
+}
+.cubo .cara {
+    position: absolute;
+    
+}
+.cara-desc{
+    height: 140px;
+    border: solid;
+    border-color: #000;
+    border-width: 1px;
+    color: #000 !important;
+    margin: auto;
+    position: relative !important;
+    overflow: auto
+}
+    
+    /*
+.content-cubo:hover >.cubo{
+  -webkit-transform: rotateX(90deg) rotateY(0deg);
+  transform: rotateX(90deg) rotateY(0deg);
+}
+
+Cara frontal*/
+.cubo .cara:nth-child(1) {
+  -webkit-transform: translateZ(70px);
+  transform: translateZ(70px);
+}
+/*Cara posterior*/
+.cubo .cara:nth-child(2) {
+  -webkit-transform: rotateX(-90deg) translateZ(70px);
+  transform: rotateX(-90deg) translateZ(70px);
+    color: #fff;
+    box-sizing: border-box;
+}
+.cubo .cara h4{
+    background-color: #2d2246;
+    color: #fff;
+    font-weight: 700;
+    border-bottom:solid;
+    border-color: #fff;
+    border-width: 2px;
+    padding: 2px 0;
+    margin-top: 0px;
+}
+
+.cubo .cara:nth-child(2) li ul{
+    padding: 0;
+}
+.cubo .cara:nth-child(2) li{
+    color: #000;
+    list-style: none;
+    font-size: 14px;
+    line-height: 24px;
+    border: solid;
+    border-color: #000;
+    margin-top: -27px;
+    border-width: 1px;
+    text-align: justify;
+    padding: 14px;
+    height: 87%;
+}    
+</style>
+</head>
+<style>
+    input[type="radio"], input[type="checkbox"] {
+        margin: 0 !important;
+    }
+</style>
+<body>
+  <div data-role="page" id="admin-main-page" style="background-color: #DAE0EE">
+  	<div data-role="header" style="background-image: url(images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+       <?php  include("header_mercadeo.phtml"); ?>
+    </div>
+    <div role="main" class="ui-content">   
+       <br><br>
+       <div class="row">
+           <div class="col-md-10 col-md-offset-1">
+               
+               <div class="portlet light bordered">
+                    <div class="portlet-title">
+                        <div class="caption">
+                           Lista de promociones:
+                        </div>
+                        <b style="margin-right: 20px;" class="btn ui-btn-right btn-primary" onclick="redirect('promociones-new')">Nueva promocion</b>
+                    </div>
+                </div>
+           </div>
+           <div class="col-md-10 col-md-offset-1 ">
+               <div class="portlet light bordered portlet-content-prov" >
+                   <div class="portlet-title">
+                       <table id="" class="display" cellspacing="0" width="100%">
+                            <thead>
+                                <tr>                          
+                                    <th>Promocion</th>
+                                </tr>
+                            </thead>
+                           <tbody>
+                               <?php
+                               foreach($data as $d){
+                                   //var_dump($d);
+                                  // $image= str_replace(' ','+',$d['headprom']);
+                                   $image= $d['headprom'];
+                               ?>
+                               <tr>
+                                    <td>
+                                        <div class="content-cubo"  onclick="descripcion(this)" onmouseleave="retornar(this)"> 
+                                            <div class="cubo">
+                                                <div class="cara" style="text-align:center;width:100%">
+                                                    <img src="<?php echo $image; ?>" title=""  >
+                                                </div>
+                                                <div class="cara cara-desc" data-info="<?php echo $d['tituprom']; ?>" >
+                                                    <h4 ><?php echo $d['tituprom']; ?> </h4>
+                                                    <div style="color:#000;margin:0; padding: 0 0 10px 10px"><?php echo $d['descrprom']; ?> </div>   
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                        
+                                   </td>
+                               </tr>
+                               <?php
+                               }
+                               ?>
+                           </tbody>
+                        </table>  
+                   </div>  
+                </div>
+           </div>
+        </div>
+           <div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF">
+                   <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+
+            </div>
+    
+      </div>
+ </div>
+<script>
+$(function(){
+    $('table.display').DataTable();
+})
+function descripcion(e){
+    var w = $(e).children('.cubo').children('.cara').children('img').width();
+    $(e).children('.cubo').children('.cara-desc').css({"width": w+"px"});
+    $(e).children('.cubo').css({"-webkit-transform" : " rotateX(90deg) rotateY(0deg) ", "transform" : "rotateX(90deg) rotateY(0deg) " });
+  
+}
+function retornar(e){
+   $(e).children('.cubo').css({"-webkit-transform" : " rotateX(90deg) rotateY(0deg) ", "transform" : "rotateX(0deg) rotateY(0deg) " });
+}
+</script>
+</body>
+</html>

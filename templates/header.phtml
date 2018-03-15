@@ -1,0 +1,45 @@
+
+<nav class="navbar navbar-default" role="navigation" style=" color:#fff; text-shadow:none; ">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle visible-xs-inline-block" data-toggle="collapse" data-target="#myNavbar" >
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+     <div class="navbar-header" style="margin-left: 20px;">
+            <a class="navbar-brand" href="#"><img src="<?php echo DOMAIN_ROOT ?>images/gdp.png" style="width: 125px;margin-left: -25px;">
+            </a>
+          </div>
+    </div>
+    <div class="collapse navbar-collapse navbar-ex1-collapse" id="myNavbar">
+        <ul class="nav navbar-nav menu-dinamic">
+            <ul class="nav navbar-nav navbar-right">
+             <li class="dropdown">
+                <a href="#"  class="dropdown-toggle" data-toggle="dropdown">
+                  <?php echo $_SESSION["user"]["CUENV_USUARIO"]; ?> <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                    <li ><a href="https://www.gdp.com.ve/iniciar/"  >Inicio</a></li>
+                  <li><a href="#!" class="logout-action">Cerrar sesión</a></li>
+                </ul>
+             </li>
+
+            </ul>
+        </ul>
+    </div>
+  </div>
+</nav>
+
+<script>
+$(function(){
+    $.ajax({
+      url: "menu",
+      type: "GET",
+      dataType: "json"
+    }).done(function(response){
+        $('.menu-dinamic').append(response.content);
+    });
+})
+
+</script>

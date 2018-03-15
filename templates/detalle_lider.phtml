@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+    <link rel="stylesheet" href="<?php echo DOMAIN_ROOT ?>js/daterangepicker/daterangepicker.css" />
+    <script src="<?php echo DOMAIN_ROOT ?>js/daterangepicker/moment.js"></script>  
+    <script src="<?php echo DOMAIN_ROOT ?>js/daterangepicker/daterangepicker.js"></script>
+
+</head>
+
+<body>
+    <!--Pagina de inicio-->
+  <div data-role="page" id="detail" >
+  	<div data-role="header" style="background-image: url(<?php echo DOMAIN_ROOT ?>images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+       <?php include("header_lider.phtml"); ?>
+        <div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right">
+            <a href="#" data-rel="back"  style="z-index:999;" class="bto_volver ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Volver</a>
+        </div>
+    </div>
+      <!-- ## Contenedor principal ## -->
+    <div role="main" class="ui-content row">
+        <?php
+        foreach($data[1]['DOC'] as $dt){
+            if($dt['TIPODOCU']=='FA'){
+                $dtl=$dt;
+            }
+        }
+                    if($data[1]['MOTIRECH']=='K'){
+                       $clase = 'facturado';
+                     }
+                    if($dt['numeguia'] != '' ){
+                       $clase = 'enguia';
+                     }
+                    $vacia="0000-00-00 00:00:00";
+                    if($dt['FENTREGA'] > $vacia ){
+                       $clase = 'despachado';
+                     }
+        //var_dump( $data[0]);
+        ?>
+        <div class="col-md-10 col-md-offset-1 row">
+            <div class="cold-md-12">
+                
+                <div class="col-md-4" >
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td style="border:none;" ><strong>Pedido:</strong> &nbsp;  </td>
+                                <td style="text-align:left; border:none;"> <label><?php echo $data[0][0]['NUMEPEDI']; ?></label>  </td>
+                            </tr> 
+                            <tr>
+                                <td style="border:none;" ><strong>Fecha Pedido: &nbsp;</strong> </td><td style="text-align:left; border:none;"> <label><?php echo date("d-m-Y", strtotime($data[0][0]['FECHA'])); ?></label>  </td>
+                            </tr>
+                            <tr>
+                                <td style="border:none;" ><strong>Cliente: &nbsp;</strong> </td><td style="text-align:left; border:none;"> <label style="font-size: 12px"><?php echo $data[0][0]['NOMBCLIE']; ?></label>  </td>
+                            </tr>
+                            <tr>
+                                <!--<td style="border:none;" ><strong>Total Monto Base Bs: &nbsp;</strong> </td><td style="text-align:left; border:none;"> <label><?php ?></label>
+                            </td> -->
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-4" >
+                    <div>
+                    <div class="semi-circulo">
+                        <div class="semi-circulo2 " style="top: 62px;">
+                            <img src="<?php echo DOMAIN_ROOT ?>images/aguja.png" id="aguja" class="<?php echo $clase; ?>">
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div class="col-md-2" >
+                <div class="leyenda">
+                    <br>
+                <ul>
+                    <li><span></span>Sin facturar</li>
+                    <li><span></span>Facturado</li>
+                    <li><span></span>Por despachar</li>
+                    <li><span></span>Despachado</li>
+                </ul>
+                </div>
+                </div>
+                <div class="col-md-2" >
+                    <center>
+                        <div data-role="collapsible" data-inset="false" style="position:absolute">
+                            <h2>Documentos</h2>
+                                <ul data-role="listview">
+                                    <?php foreach($data[1]['DOC']  as $v){ ?>
+                                    <li>
+                                        <a href="../<?php if($v['TIPODOCU']=='FA'){ ?>factura<?php }else{ ?>devolucion<?php } ?>/<?php echo $v['NUMEDOCU']; ?>" transition="flip" data-rel="dialog"
+                                           ><?php echo $v['TIPODOCU'].': '.$v['NUMEDOCU']; ?></a>
+                                    </li>
+                                    <?php } ?>
+                                </ul>
+                            </div><!-- /collapsible -->
+                        
+                    </center>
+                <!--
+                    <center><a href="../devoluciones/<?php echo $data[0][0]['NUMEPEDI']; ?>" data-role="button" transition="flip" data-rel="dialog" data-theme="d" >Devolucion</a></center>
+                -->
+                </div>
+                
+                
+            </div>
+            <div class="cold-md-12">
+                <br>
+                <br>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>N°</th><th>Cod Producto</th><th>Producto</th><th>Unidades</th><th>Cajas</th><th style="text-align: center">Monto</th><th style="text-align: center">IVA</th><th style="text-align: center">Total</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <?php
+                        $i=1;
+                        foreach($data[0] as $detal){
+    
+                            $t_prod=($detal['PRECIO']/$detal['UNIDCAJA']) * $detal['UNIDADES'];
+                        ?>
+                            <tr>
+                                <td><?php echo $i ?></td>
+                                <td><?php echo $detal['CODIPROD']; ?></td><td><?php echo $detal['DESCPROD']; ?></td>
+                                <td><?php echo $detal['UNIDADES']; ?></td><td><?php echo $detal['CAJAS']; ?></td>
+                                <td style="text-align: right"><?php echo number_format($detal['PRECIO'],2);  ?></td><td style="text-align: right"><?php if($detal['IMPU1']){ echo number_format($t_prod*0.12,2); $iva=$t_prod*0.12; }else echo '0.00'; ?></td>
+                                <td style="text-align: right"><?php  if($detal['IMPU1']){ echo number_format($t_prod*1.12,2); $total=$t_prod*1.12;}else{ echo number_format($t_prod,2); $total=$t_prod;} ?></td>
+                            </tr>
+                        <?php $tunid=$detal['UNIDADES']+$tunid; $tcaja=$detal['CAJAS']+$tcaja; $tprecio=$detal['PRECIO']+$tprecio;  $tiva=$iva+$tiva; $ttotal=$total+$ttotal;
+                        $i++;
+                        } ?>
+                        <tr>
+                            <td> &nbsp;</td><td> &nbsp;</td> <td> &nbsp;</td> <td><strong><?php echo $tunid; ?></strong></td> <td><strong><?php echo $tcaja; ?></strong></td>
+                            <td style="text-align: right"><strong><?php echo number_format($tprecio,2); ?> </strong></td>
+                            <td style="text-align: right"><strong><?php echo number_format($tiva,2); ?> </strong></td>
+                            <td style="text-align: right"><strong><?php echo number_format($ttotal,2); ?> </strong></td>
+                        </tr>
+                    </tbody>
+                    
+                </table>
+
+                 <div style="border:none;" ><td><strong>Total Monto Base Bs: &nbsp;<?php echo number_format($tprecio,2); ?> </strong></td><td style="text-align:left; border:none;"> <label><?php ?></label> </div> 
+            </div>
+            
+            
+        </div>
+        
+    </div>
+    
+      <!-- ## FIN contenedor principal ## -->
+  	<div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF;">
+      <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+      </div>
+    </div>
+<script>
+
+</script>
+</body>
+</html>

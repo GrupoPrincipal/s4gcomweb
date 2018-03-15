@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+</head>
+
+<body>
+ <div data-role="page" style="background-color: #DAE0EE">
+  	<div data-role="header" style="background-image: url(<?php echo DOMAIN_ROOT ?>images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+      <?php include("header_seller.phtml"); ?>
+    </div>
+
+     
+<div role="main" class="ui-content row">
+   <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+           <div role="main" class="ui-content">
+                <div data-role="collapsibleset">
+                   <div class="table-responsive">  
+                       <table id="" class="display" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Cheque</th>
+                                <th>Fecha</th>		                            
+                                <th>Banco Emisor</th> 
+                                <th style="text-align: right">Monto</th>                                   
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach($data as $d){ ?>
+                            <tr>
+                                <td><?php echo $d['CODICLIE'].'-'.$d['NOMBCLIE']; ?></td>
+                                <td><?php echo $d['NUMECHEQ']; ?></td>
+                                <td><?php echo $d['FECHA']; ?></td>
+                                <td><?php echo $d['NOMBBANC']; ?></td>
+                                <td><?php echo $d['MONTCHEQ']; ?></td>
+                            </tr>
+                            <?php } ?>
+                        </tbody>			       
+                       </table>
+                   </div>
+                </div>
+             </div>
+        </div>
+   </div>    
+</div>  
+      	 		
+     
+  	<div data-role="footer" data-position="fixed" style="background-color: #0188C8; color: #FFFFFF">
+      <h4>Grupo Principal © <?php echo date("Y"); ?></h4>
+    </div>
+  </div>
+<script>
+  $(function(){
+      $('table.display').DataTable();
+  })
+</script>
+</body>
+</html>

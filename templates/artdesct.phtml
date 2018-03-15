@@ -1,0 +1,82 @@
+<?php 
+ $pags=$data['size']/27;
+?>
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+</head>
+
+<body>
+  <div data-role="page" id="descontinuados" >
+  	<div data-role="header" style="background-image: url(<?php echo DOMAIN_ROOT ?>images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+        <?php include("header.phtml"); ?>
+    </div>
+      <!-- ## Contenedor principal ## -->
+    <div role="main" class="ui-content">
+<br><br>
+<div class="row">
+    <div class="col-md-11 col-md-offset-1   row" id="descontinuados">
+        <div class="col-md-12 "  style="text-align: right;">
+            <ul class="pagination pagination-lg" style="margin-right:10px;">
+               <?php
+                for($i=1;$i<$pags;$i++){
+                ?>
+                    <li class="<?php if($data['pag'] == $i){ ?> active <?php } ?>" ><a href="#" onclick="redirect('descontinuados/<?php echo $i ?>')"><?php echo $i; ?></a></li>
+                <?php
+                }
+                ?>
+             </ul>
+        </div>
+        <div class="col-md-12 ">
+           <?php foreach($data['desc'] as $d){ ?>
+                <div class="prod-desc " >
+                    <div class="content-ficha col-md-12 ">
+                        <div class="col-md-5">
+                            <?php
+                                if(!empty($d['IMGV_IMAGEN1'])){
+                            ?> 
+                                    <img src="data:image/jpeg;base64,<?php echo $d['IMGV_IMAGEN1']; ?>" > 
+                            <?php
+                                }else{
+                            ?>
+                            <img src="<?php echo DOMAIN_ROOT ?>images/no-image.png" />
+                            <?php
+                                }
+                            ?>
+                        </div>
+                        <div class="col-md-7 content-descripcion" >
+                            <p class="p-descripcion"><?php echo trim($d['DESCPROD']); ?></p>
+                        </div>
+                    </div>
+                </div>
+            <?php } ?>
+        </div>
+        <div class="col-md-12 " style="text-align: right;">
+            <ul class="pagination pagination-lg" style="margin-right:10px;">
+                <?php
+                for($i=1;$i<$pags;$i++){
+                ?>
+                    <li class="<?php if($data['pag'] == $i){ ?> active <?php } ?>" ><a href="#" onclick="redirect('descontinuados/<?php echo $i ?>')"><?php echo $i; ?></a></li>
+                <?php
+                }
+                ?>
+             </ul>
+        </div>
+    </div>
+</div>
+        
+
+<script>
+
+</script>
+
+  </div>
+      <!-- ## FIN contenedor principal ## -->
+      
+  	<div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF;">
+      <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+    </div>
+  </div>
+</body>
+</html>

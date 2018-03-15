@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+
+<body>
+<div data-role="page" id="detail" >    
+    <div data-role="header">
+        <h2 style="color: #3849b1">Pagos de Factura <?php echo $fact=$data['factura']; ?></h2>
+    </div>
+      <!-- ## Contenedor principal ## -->
+    <div role="main" class="ui-content row">
+    <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+       <div role="main" class="ui-content">
+            <div data-role="collapsibleset">
+			   <div class="table-responsive">  
+			     <table id="" class="table table-hover table-condensed" cellspacing="0" width="100%">
+			                    <thead>
+			                        <tr>
+			                            <th>Fecha</th>
+			                            <th>N° Recibo</th>
+			                            <th>Modo de pago</th>			                            
+			                            <th>Banco</th>			                            
+			                            <th style="text-align: right">Monto</th> 
+			                            <th>&nbsp;</th>                                   
+			                        </tr>
+			                    </thead>
+			                    <tbody>
+			                        <?php
+			                        foreach($data as $d){      ?>  
+			                        <?php if($d['FECHA']!=0){ $tmonto=$d['MONTO']+$tmonto;  ?>                
+			                        <tr>
+			                            <td><?php echo $d['FECHA']; ?></td>
+			                            <td><?php echo $d['DESCRI']; ?></td>
+			                            <td><?php echo $d['nombretpago']; ?></td>
+			                            <td><?php echo $d['NOMBBANC']; ?></td>			                          
+			                            <td style="text-align: right"><?php echo number_format($d['MONTO'],2); ?></td>  
+			                            <td style="text-align: center;"> <a href="../cpantalla/<?php echo $d['id']; ?>" class="btn btn-default btn-sm" data-role="button" title="Captura de pantalla" transition="flip" data-rel="dialog" data-theme="d"> <span class="glyphicon glyphicon-picture"></span></a></td>                                       
+			                        </tr>
+			                        <?php } 
+			                        }   
+			                       ?>
+
+
+			                    </tbody>
+			        <tr>
+			          <td>&nbsp;</td>      
+			          <td>&nbsp;</td>   
+			          <td>&nbsp;</td>   		
+			          <td>&nbsp;</td>  	       
+			          <td style="text-align: right"><strong><?php echo number_format($tmonto,2); ?></strong></td>    
+			        </tr>  
+			    </table>
+			   </div>
+			</div>
+	     </div>
+
+  
+	</div>
+
+</div>    
+      
+    </div>
+  </div>
+</body>
+</html>

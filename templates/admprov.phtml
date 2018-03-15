@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <?php include("enlaces.phtml"); ?>
+<link rel="stylesheet" href="<?php echo DOMAIN_ROOT ?>js/jquery-ui/jquery-ui.theme.css" />
+<script src="<?php echo DOMAIN_ROOT ?>js/jquery-ui/jquery-ui.js"></script>
+
+    </head>
+
+<body>
+  <div data-role="page" id="admin-main-page" style="background-color: #DAE0EE">
+  	<div data-role="header" style="background-image: url(images/bannergdp5.jpg); background-size: cover; background-repeat: no-repeat; background-position: 50% -186.152px;min-height:100px;">
+      <?php  include("headeradm.phtml"); ?>
+    </div>
+    <div role="main" class="ui-content">   
+       <br><br>
+       <div class="row">
+           <div class="Herramientas col-md-10 col-md-offset-1">
+            <b class="btn btn-default" onclick="herramienta(1)">Redimencionar</b>
+            <b class="btn btn-default" onclick="herramienta(2)">Mover</b>
+            <b class="btn btn-default" onclick="herramienta(4)">Añadir texto</b>
+            <b><input type="color" class="btn-color color" onchange="herramienta(3)">Color</b>
+               <div id="otras-opciones"></div>
+           </div>
+           <div class="lienzo col-md-10 col-md-offset-1 ">
+           </div>
+        </div>
+           <div data-role="footer" data-position="fixed" style="background-color: #3E3E3E; color: #FFFFFF">
+                   <h4>Grupo Principal © <?php echo date("Y"); ?> </h4>
+
+            </div>
+    
+      </div>
+ </div>
+<script>
+
+</script>
+</body>
+</html>
